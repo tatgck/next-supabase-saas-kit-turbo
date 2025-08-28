@@ -125,7 +125,7 @@ function FaqItem({
             'hover:underline-none cursor-pointer font-sans font-medium'
           }
         >
-          <Trans i18nKey={item.question} defaults={item.question} />
+          <Trans i18nKey={item.question} />
         </h2>
 
         <div>
@@ -136,7 +136,7 @@ function FaqItem({
       </summary>
 
       <div className={'text-muted-foreground flex flex-col gap-y-3 py-1'}>
-        <Trans i18nKey={item.answer} defaults={item.answer} />
+        <Trans i18nKey={item.answer} />
       </div>
     </details>
   );

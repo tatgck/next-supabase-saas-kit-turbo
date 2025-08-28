@@ -66,7 +66,7 @@ export function CurrentSubscriptionCard({
             />
 
             <span data-test={'current-plan-card-product-name'}>
-              <Trans i18nKey={product.name} defaults={product.name} />
+              <Trans i18nKey={product.name} />
             </span>
 
             <CurrentPlanBadge status={subscription.status} />
@@ -74,10 +74,7 @@ export function CurrentSubscriptionCard({
 
           <div>
             <p className={'text-muted-foreground'}>
-              <Trans
-                i18nKey={product.description}
-                defaults={product.description}
-              />
+              <Trans i18nKey={product.description} />
             </p>
           </div>
         </div>

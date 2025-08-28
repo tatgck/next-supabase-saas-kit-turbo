@@ -5,7 +5,6 @@ import { Scissors, Users, MapPin, Star, Zap, Sparkles, Brain, ArrowRight, CheckC
 
 import { Button } from '@kit/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@kit/ui/card';
-import { Trans } from '@kit/ui/trans';
 
 const features = [
   {
