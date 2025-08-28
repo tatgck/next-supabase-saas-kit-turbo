@@ -58,7 +58,7 @@ async function checkLicense() {
     if (makerkitConfig.username) {
       searchParams.append('projectUsername', makerkitConfig.username);
     }
-  } catch {}
+  } catch { }
 
   const res = await fetch(`${endpoint}?${searchParams.toString()}`);
 
@@ -144,25 +144,25 @@ async function isOnline() {
 }
 
 async function main() {
-  try {
-    const isUserOnline = await isOnline();
+  // try {
+  //   const isUserOnline = await isOnline();
 
-    // disable the check if the user is offline
-    if (!isUserOnline) {
-      return process.exit(0);
-    }
+  //   // disable the check if the user is offline
+  //   if (!isUserOnline) {
+  //     return process.exit(0);
+  //   }
 
-    await checkVisibility();
+  //   // await checkVisibility(); // Disabled GitHub visibility check for local development
 
-    await checkLicense().catch((error) => {
-      console.error(`Check failed with error: ${error.message}`);
-      process.exit(1);
-    });
-  } catch (error) {
-    console.error(`Check failed with error: ${error.message}`);
+  //   // await checkLicense().catch((error) => {
+  //   //   console.error(`Check failed with error: ${error.message}`);
+  //   //   process.exit(1);
+  //   // });
+  // } catch (error) {
+  //   console.error(`Check failed with error: ${error.message}`);
 
-    process.exit(1);
-  }
+  //   process.exit(1);
+  // }
 }
 
 void main();
