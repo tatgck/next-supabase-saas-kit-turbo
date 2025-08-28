@@ -10,7 +10,7 @@ async function AdvertisementsPage() {
   const api = createBarberPlatformApi(client);
   
   // 暂时返回空数组，广告数据需要从数据库获取
-  const advertisements = [];
+  const advertisements: any[] = [];
 
   return (
     <>
