@@ -111,4 +111,4 @@ schema_paths = [
 ]
 
 [db.seed]
-sql_paths = ['seed.sql', './seeds/*.sql']
+sql_paths = ['seed.sql', './seeds/*.sql', 'seed-barber-platform.sql']

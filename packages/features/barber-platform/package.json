@@ -1,0 +1,41 @@
+{
+  "name": "@kit/barber-platform",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
+    "format": "prettier --check \"**/*.{ts,tsx}\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./components": "./src/components/index.ts",
+    "./types": "./src/types/index.ts",
+    "./api": "./src/lib/server/api.ts",
+    "./services": "./src/lib/server/services.ts"
+  },
+  "dependencies": {
+    "@kit/shared": "workspace:*",
+    "@kit/supabase": "workspace:*",
+    "@kit/ui": "workspace:*",
+    "@supabase/supabase-js": "2.50.2",
+    "lucide-react": "^0.523.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@kit/eslint-config": "workspace:*",
+    "@kit/prettier-config": "workspace:*",
+    "@kit/tsconfig": "workspace:*",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6"
+  },
+  "prettier": "@kit/prettier-config",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  }
+}
