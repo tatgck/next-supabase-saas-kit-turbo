@@ -6,3 +6,5 @@ export { OperationsDashboard } from './operations-dashboard';
 export { AdminBarberPlatformSidebar } from './admin-sidebar';
 export { StoreDialog } from './store-dialog';
 export { StoreDetailsDialog } from './store-details-dialog';
+export { BarberDialog } from './barber-dialog';
+export { BarberDetailsDialog } from './barber-details-dialog';

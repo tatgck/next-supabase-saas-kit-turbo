@@ -133,6 +133,38 @@ class BarberPlatformApi {
   }
 
   /**
+   * 创建理发师
+   */
+  async createBarber(barberData: {
+    name: string;
+    phone?: string;
+    email?: string;
+    experience_years?: number;
+    specialty?: string[];
+    description?: string;
+    is_available?: boolean;
+  }) {
+    // 生成UUID作为理发师ID
+    const barberId = crypto.randomUUID();
+    
+    const { data, error } = await this.client
+      .from('barbers')
+      .insert([{
+        id: barberId,
+        ...barberData,
+        is_available: barberData.is_available ?? true
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
    * 更新门店信息
    */
   async updateStore(storeId: string, updates: Partial<Database['public']['Tables']['stores']['Update']>) {
@@ -259,7 +291,25 @@ class BarberPlatformApi {
       throw error;
     }
 
+    if (!data) {
+      throw new Error(`Barber with ID ${barberId} not found or no changes made`);
+    }
+
     return data;
+  }
+
+  /**
+   * 删除理发师
+   */
+  async deleteBarber(barberId: string) {
+    const { error } = await this.client
+      .from('barbers')
+      .delete()
+      .eq('id', barberId);
+
+    if (error) {
+      throw error;
+    }
   }
 
   /**
