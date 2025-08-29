@@ -77,11 +77,11 @@ export function StoresTable({
     );
   }
 
-  if (stores.length === 0) {
+  if (!stores || stores.length === 0) {
     return (
       <div className="text-center py-12">
         <Store className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">暂无门店数据</p>
+        <p className="text-muted-foreground">No store data available</p>
       </div>
     );
   }
@@ -97,7 +97,7 @@ export function StoresTable({
             onClick={() => setViewMode('grid')}
             className="rounded-r-none"
           >
-            网格视图
+            Grid View
           </Button>
           <Button
             variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -105,7 +105,7 @@ export function StoresTable({
             onClick={() => setViewMode('list')}
             className="rounded-l-none"
           >
-            列表视图
+            List View
           </Button>
         </div>
       </div>
@@ -119,7 +119,7 @@ export function StoresTable({
                   <div>
                     <CardTitle className="text-lg">{store.name}</CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      {store.owner_id ? '已关联店主' : '无店主'}
+                      {store.owner_id ? 'Owner associated' : 'No owner'}
                     </p>
                   </div>
                   <DropdownMenu>
@@ -132,25 +132,25 @@ export function StoresTable({
                       {onViewStore && (
                         <DropdownMenuItem onClick={() => onViewStore(store)}>
                           <Eye className="h-4 w-4 mr-2" />
-                          查看详情
+                          View Details
                         </DropdownMenuItem>
                       )}
                       {onEditStore && (
                         <DropdownMenuItem onClick={() => onEditStore(store)}>
                           <Edit className="h-4 w-4 mr-2" />
-                          编辑门店
+                          Edit Store
                         </DropdownMenuItem>
                       )}
                       {store.status === 'pending' && onApproveStore && (
                         <DropdownMenuItem onClick={() => onApproveStore(store)}>
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          批准门店
+                          Approve Store
                         </DropdownMenuItem>
                       )}
                       {store.status === 'pending' && onRejectStore && (
                         <DropdownMenuItem onClick={() => onRejectStore(store)}>
                           <XCircle className="h-4 w-4 mr-2" />
-                          拒绝门店
+                          Reject Store
                         </DropdownMenuItem>
                       )}
                       {onDeleteStore && (
@@ -159,7 +159,7 @@ export function StoresTable({
                           className="text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          删除门店
+                          Delete Store
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -204,11 +204,11 @@ export function StoresTable({
                   <div className="grid grid-cols-2 gap-4 pt-3 border-t">
                     <div className="text-center">
                       <div className="text-2xl font-bold">{store.barber_count || 0}</div>
-                      <div className="text-xs text-muted-foreground">理发师</div>
+                      <div className="text-xs text-muted-foreground">Barbers</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold">{store.workstation_count || 0}</div>
-                      <div className="text-xs text-muted-foreground">工位</div>
+                      <div className="text-xs text-muted-foreground">Workstations</div>
                     </div>
                   </div>
                   
@@ -217,7 +217,7 @@ export function StoresTable({
                       <div className="text-lg font-semibold text-green-600">
                         ¥{store.monthly_revenue.toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">月收入</div>
+                      <div className="text-xs text-muted-foreground">Monthly Revenue</div>
                     </div>
                   )}
                 </div>
@@ -231,13 +231,13 @@ export function StoresTable({
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4">门店信息</th>
-                  <th className="text-left p-4">状态</th>
-                  <th className="text-left p-4">评分</th>
-                  <th className="text-left p-4">理发师</th>
-                  <th className="text-left p-4">工位</th>
-                  <th className="text-left p-4">月收入</th>
-                  <th className="text-left p-4">操作</th>
+                  <th className="text-left p-4">Store Info</th>
+                  <th className="text-left p-4">Status</th>
+                  <th className="text-left p-4">Rating</th>
+                  <th className="text-left p-4">Barbers</th>
+                  <th className="text-left p-4">Workstations</th>
+                  <th className="text-left p-4">Monthly Revenue</th>
+                  <th className="text-left p-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -266,7 +266,7 @@ export function StoresTable({
                           </span>
                         </div>
                       ) : (
-                        <span className="text-muted-foreground">暂无评分</span>
+                        <span className="text-muted-foreground">No ratings yet</span>
                       )}
                     </td>
                     <td className="p-4">{store.barber_count || 0}</td>

@@ -75,6 +75,9 @@ create table if not exists public.workstations (
   updated_at timestamptz default current_timestamp
 );
 
+-- 理发师邀请状态枚举
+create type public.barber_invitation_status as enum('pending', 'accepted', 'expired', 'revoked');
+
 -- 理发师表
 create table if not exists public.barbers (
   id uuid default auth.uid() primary key,
@@ -91,8 +94,26 @@ create table if not exists public.barbers (
   is_available boolean default true,
   avatar_url varchar(1000),
   description text,
+  invitation_token varchar(100),
+  invitation_expires_at timestamptz,
   created_at timestamptz default current_timestamp,
   updated_at timestamptz default current_timestamp
+);
+
+-- 理发师邀请表
+create table if not exists public.barber_invitations (
+  id uuid default extensions.uuid_generate_v4() primary key,
+  store_id uuid references public.stores on delete cascade not null,
+  email varchar(320) not null,
+  name varchar(255),
+  phone varchar(20),
+  token varchar(100) not null unique,
+  status public.barber_invitation_status default 'pending' not null,
+  expires_at timestamptz not null,
+  created_by uuid references auth.users not null,
+  created_at timestamptz default current_timestamp,
+  updated_at timestamptz default current_timestamp,
+  accepted_at timestamptz
 );
 
 -- 广告表
@@ -158,6 +179,12 @@ create policy "barbers_read" on public.barbers for select to authenticated using
 create policy "barbers_manage" on public.barbers for all to authenticated 
   using (id = auth.uid() or exists (select 1 from public.stores where id = store_id and owner_id = auth.uid()));
 
+-- 理发师邀请RLS策略
+create policy "barber_invitations_read" on public.barber_invitations for select to authenticated 
+  using (created_by = auth.uid() or exists (select 1 from public.stores where id = store_id and owner_id = auth.uid()));
+create policy "barber_invitations_manage" on public.barber_invitations for all to authenticated 
+  using (created_by = auth.uid() or exists (select 1 from public.stores where id = store_id and owner_id = auth.uid()));
+
 -- 广告RLS策略
 create policy "advertisements_read" on public.advertisements for select to authenticated using (true);
 create policy "advertisements_manage" on public.advertisements for all to authenticated using (created_by = auth.uid());
@@ -175,6 +202,10 @@ create index idx_stores_status on public.stores(status);
 create index idx_workstations_store_id on public.workstations(store_id);
 create index idx_workstations_status on public.workstations(status);
 create index idx_barbers_store_id on public.barbers(store_id);
+create index idx_barbers_invitation_token on public.barbers(invitation_token);
+create index idx_barber_invitations_token on public.barber_invitations(token);
+create index idx_barber_invitations_email on public.barber_invitations(email);
+create index idx_barber_invitations_status on public.barber_invitations(status);
 create index idx_advertisements_created_by on public.advertisements(created_by);
 create index idx_advertisements_status on public.advertisements(status);
 create index idx_support_tickets_user_id on public.support_tickets(user_id);
@@ -196,6 +227,9 @@ create trigger update_workstations_updated_at before update on public.workstatio
   for each row execute function public.update_updated_at();
 
 create trigger update_barbers_updated_at before update on public.barbers
+  for each row execute function public.update_updated_at();
+
+create trigger update_barber_invitations_updated_at before update on public.barber_invitations
   for each row execute function public.update_updated_at();
 
 create trigger update_advertisements_updated_at before update on public.advertisements

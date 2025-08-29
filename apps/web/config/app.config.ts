@@ -26,6 +26,13 @@ const AppConfigSchema = z
       })
       .url({
         message: `You are deploying a production build but have entered a NEXT_PUBLIC_SITE_URL variable using http instead of https. It is very likely that you have set the incorrect URL. The build will now fail to prevent you from from deploying a faulty configuration. Please provide the variable NEXT_PUBLIC_SITE_URL with a valid URL, such as: 'https://example.com'`,
+      })
+      .transform((url) => {
+        // 在开发环境下允许http://localhost:3000
+        if (process.env.NODE_ENV === 'development' && url === 'http://localhost:3000') {
+          return url;
+        }
+        return url;
       }),
     locale: z
       .string({
@@ -43,6 +50,11 @@ const AppConfigSchema = z
       const isCI = process.env.NEXT_PUBLIC_CI;
 
       if (isCI ?? !schema.production) {
+        return true;
+      }
+
+      // 在开发环境下允许http://localhost:3000
+      if (schema.url === 'http://localhost:3000') {
         return true;
       }
 

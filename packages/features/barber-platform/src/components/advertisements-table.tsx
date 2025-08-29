@@ -94,11 +94,11 @@ export function AdvertisementsTable({
     );
   }
 
-  if (advertisements.length === 0) {
+  if (!advertisements || advertisements.length === 0) {
     return (
       <div className="text-center py-12">
         <Megaphone className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">暂无广告数据</p>
+        <p className="text-muted-foreground">No advertisement data available</p>
       </div>
     );
   }
@@ -114,7 +114,7 @@ export function AdvertisementsTable({
             onClick={() => setViewMode('grid')}
             className="rounded-r-none"
           >
-            网格视图
+            Grid View
           </Button>
           <Button
             variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -122,7 +122,7 @@ export function AdvertisementsTable({
             onClick={() => setViewMode('list')}
             className="rounded-l-none"
           >
-            列表视图
+            List View
           </Button>
         </div>
       </div>
@@ -160,13 +160,13 @@ export function AdvertisementsTable({
                       {onViewAdvertisement && (
                         <DropdownMenuItem onClick={() => onViewAdvertisement(ad)}>
                           <Eye className="h-4 w-4 mr-2" />
-                          查看详情
+                          View Details
                         </DropdownMenuItem>
                       )}
                       {onEditAdvertisement && (
                         <DropdownMenuItem onClick={() => onEditAdvertisement(ad)}>
                           <Edit className="h-4 w-4 mr-2" />
-                          编辑广告
+                          Edit Advertisement
                         </DropdownMenuItem>
                       )}
                       {onToggleStatus && (ad.status === 'active' || ad.status === 'paused') && (
@@ -174,12 +174,12 @@ export function AdvertisementsTable({
                           {ad.status === 'active' ? (
                             <>
                               <Pause className="h-4 w-4 mr-2" />
-                              暂停广告
+                              Pause Advertisement
                             </>
                           ) : (
                             <>
                               <Play className="h-4 w-4 mr-2" />
-                              启动广告
+                              Start Advertisement
                             </>
                           )}
                         </DropdownMenuItem>
@@ -190,7 +190,7 @@ export function AdvertisementsTable({
                           className="text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          删除广告
+                          Delete Advertisement
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -207,11 +207,11 @@ export function AdvertisementsTable({
                   <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                     <div className="text-center">
                       <div className="text-2xl font-bold">{ad.impressions.toLocaleString()}</div>
-                      <div className="text-xs text-muted-foreground">展示次数</div>
+                      <div className="text-xs text-muted-foreground">Impressions</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold">{ad.clicks.toLocaleString()}</div>
-                      <div className="text-xs text-muted-foreground">点击次数</div>
+                      <div className="text-xs text-muted-foreground">Clicks</div>
                     </div>
                   </div>
                   
@@ -220,13 +220,13 @@ export function AdvertisementsTable({
                       <div className="text-lg font-semibold">
                         {ad.ctr > 0 ? `${ad.ctr.toFixed(2)}%` : '0%'}
                       </div>
-                      <div className="text-xs text-muted-foreground">点击率</div>
+                      <div className="text-xs text-muted-foreground">CTR</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-semibold text-green-600">
                         {ad.conversions.toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">转化次数</div>
+                      <div className="text-xs text-muted-foreground">Conversions</div>
                     </div>
                   </div>
                   
@@ -235,13 +235,13 @@ export function AdvertisementsTable({
                       <div className="text-sm font-medium">
                         ¥{ad.budget.toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">预算</div>
+                      <div className="text-xs text-muted-foreground">Budget</div>
                     </div>
                     <div className="text-center">
                       <div className="text-sm font-medium text-orange-600">
                         ¥{ad.spent.toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">已花费</div>
+                      <div className="text-xs text-muted-foreground">Spent</div>
                     </div>
                   </div>
                   
@@ -250,7 +250,7 @@ export function AdvertisementsTable({
                       <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
                       <span>{new Date(ad.start_date).toLocaleDateString()}</span>
                     </div>
-                    <span className="text-muted-foreground">至</span>
+                    <span className="text-muted-foreground">to</span>
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
                       <span>{new Date(ad.end_date).toLocaleDateString()}</span>
@@ -259,7 +259,7 @@ export function AdvertisementsTable({
                   
                   {ad.target_audience && (
                     <div className="text-sm text-muted-foreground pt-2 border-t">
-                      <span className="font-medium">目标受众: </span>
+                      <span className="font-medium">Target Audience: </span>
                       {ad.target_audience}
                     </div>
                   )}
@@ -274,14 +274,14 @@ export function AdvertisementsTable({
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4">广告信息</th>
-                  <th className="text-left p-4">类型</th>
-                  <th className="text-left p-4">平台</th>
-                  <th className="text-left p-4">状态</th>
-                  <th className="text-left p-4">展示/点击</th>
-                  <th className="text-left p-4">点击率</th>
-                  <th className="text-left p-4">预算/花费</th>
-                  <th className="text-left p-4">操作</th>
+                  <th className="text-left p-4">Advertisement Info</th>
+                  <th className="text-left p-4">Type</th>
+                  <th className="text-left p-4">Platform</th>
+                  <th className="text-left p-4">Status</th>
+                  <th className="text-left p-4">Impressions/Clicks</th>
+                  <th className="text-left p-4">CTR</th>
+                  <th className="text-left p-4">Budget/Spent</th>
+                  <th className="text-left p-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -312,8 +312,8 @@ export function AdvertisementsTable({
                     </td>
                     <td className="p-4">
                       <div className="text-sm">
-                        <div>{ad.impressions.toLocaleString()} 展示</div>
-                        <div>{ad.clicks.toLocaleString()} 点击</div>
+                        <div>{ad.impressions.toLocaleString()} impressions</div>
+                        <div>{ad.clicks.toLocaleString()} clicks</div>
                       </div>
                     </td>
                     <td className="p-4">
@@ -321,8 +321,8 @@ export function AdvertisementsTable({
                     </td>
                     <td className="p-4">
                       <div className="text-sm">
-                        <div>预算: ¥{ad.budget.toLocaleString()}</div>
-                        <div className="text-orange-600">花费: ¥{ad.spent.toLocaleString()}</div>
+                        <div>Budget: ¥{ad.budget.toLocaleString()}</div>
+                        <div className="text-orange-600">Spent: ¥{ad.spent.toLocaleString()}</div>
                       </div>
                     </td>
                     <td className="p-4">

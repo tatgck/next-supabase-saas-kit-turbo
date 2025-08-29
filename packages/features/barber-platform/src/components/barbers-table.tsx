@@ -72,7 +72,7 @@ export function BarbersTable({
     return (
       <div className="text-center py-12">
         <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">暂无理发师数据</p>
+        <p className="text-muted-foreground">No barber data available</p>
       </div>
     );
   }
@@ -88,7 +88,7 @@ export function BarbersTable({
             onClick={() => setViewMode('grid')}
             className="rounded-r-none"
           >
-            网格视图
+            Grid View
           </Button>
           <Button
             variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -96,7 +96,7 @@ export function BarbersTable({
             onClick={() => setViewMode('list')}
             className="rounded-l-none"
           >
-            列表视图
+            List View
           </Button>
         </div>
       </div>
@@ -130,13 +130,13 @@ export function BarbersTable({
                       {onViewBarber && (
                         <DropdownMenuItem onClick={() => onViewBarber(barber)}>
                           <Eye className="h-4 w-4 mr-2" />
-                          查看详情
+                          View Details
                         </DropdownMenuItem>
                       )}
                       {onEditBarber && (
                         <DropdownMenuItem onClick={() => onEditBarber(barber)}>
                           <Edit className="h-4 w-4 mr-2" />
-                          编辑信息
+                          Edit Information
                         </DropdownMenuItem>
                       )}
                       {onToggleAvailability && (
@@ -144,12 +144,12 @@ export function BarbersTable({
                           {barber.is_available ? (
                             <>
                               <XCircle className="h-4 w-4 mr-2" />
-                              设为不可预约
+                              Set as Unavailable
                             </>
                           ) : (
                             <>
                               <CheckCircle className="h-4 w-4 mr-2" />
-                              设为可预约
+                              Set as Available
                             </>
                           )}
                         </DropdownMenuItem>
@@ -160,7 +160,7 @@ export function BarbersTable({
                           className="text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          删除理发师
+                          Delete Barber
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -182,7 +182,7 @@ export function BarbersTable({
                   
                   {barber.specialty && barber.specialty.length > 0 && (
                     <div className="text-sm">
-                      <span className="text-muted-foreground">擅长: </span>
+                      <span className="text-muted-foreground">Specialty: </span>
                       {barber.specialty.join(', ')}
                     </div>
                   )}
@@ -204,13 +204,13 @@ export function BarbersTable({
                   <div className="grid grid-cols-2 gap-4 pt-3 border-t">
                     <div className="text-center">
                       <div className="text-2xl font-bold">{barber.total_bookings}</div>
-                      <div className="text-xs text-muted-foreground">总预约</div>
+                      <div className="text-xs text-muted-foreground">Total Bookings</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
                         ¥{barber.total_earnings.toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">总收入</div>
+                      <div className="text-xs text-muted-foreground">Total Earnings</div>
                     </div>
                   </div>
                   
@@ -246,7 +246,7 @@ export function BarbersTable({
                       <div>
                         <div className="font-medium">{barber.name}</div>
                         <div className="text-sm text-muted-foreground">
-                          {barber.specialty?.join(', ') || '无擅长领域'}
+                          {barber.specialty?.join(', ') || 'No specialty'}
                         </div>
                       </div>
                     </td>
@@ -265,11 +265,11 @@ export function BarbersTable({
                           </span>
                         </div>
                       ) : (
-                        <span className="text-muted-foreground">暂无评分</span>
+                        <span className="text-muted-foreground">No ratings yet</span>
                       )}
                     </td>
                     <td className="p-4">
-                      {barber.experience_years ? `${barber.experience_years}年` : '-'}
+                      {barber.experience_years ? `${barber.experience_years} years` : '-'}
                     </td>
                     <td className="p-4">{barber.total_bookings}</td>
                     <td className="p-4">

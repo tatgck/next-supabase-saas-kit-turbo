@@ -79,11 +79,11 @@ export function WorkstationsTable({
     );
   }
 
-  if (workstations.length === 0) {
+  if (!workstations || workstations.length === 0) {
     return (
       <div className="text-center py-12">
         <Monitor className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">暂无工位数据</p>
+        <p className="text-muted-foreground">No workstation data available</p>
       </div>
     );
   }

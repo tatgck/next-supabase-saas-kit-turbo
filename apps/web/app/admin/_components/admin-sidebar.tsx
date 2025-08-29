@@ -56,15 +56,54 @@ export function AdminSidebar() {
               </SidebarMenuButton>
 
               <SidebarMenuButton
-                isActive={path.includes('/admin/barber-platform')}
+                isActive={path.includes('/admin/stores')}
                 asChild
               >
                 <Link
                   className={'flex size-full gap-2.5'}
-                  href={'/admin/barber-platform'}
+                  href={'/admin/stores'}
                 >
                   <Store className={'h-4'} />
-                  <span>Barber Platform</span>
+                  <span>Store Management</span>
+                </Link>
+              </SidebarMenuButton>
+
+              <SidebarMenuButton
+                isActive={path.includes('/admin/barbers')}
+                asChild
+              >
+                <Link
+                  className={'flex size-full gap-2.5'}
+                  href={'/admin/barbers'}
+                >
+                  <Scissors className={'h-4'} />
+                  <span>Barber Management</span>
+                </Link>
+              </SidebarMenuButton>
+
+              <SidebarMenuButton
+                isActive={path.includes('/admin/workstations')}
+                asChild
+              >
+                <Link
+                  className={'flex size-full gap-2.5'}
+                  href={'/admin/workstations'}
+                >
+                  <Monitor className={'h-4'} />
+                  <span>Workstation Management</span>
+                </Link>
+              </SidebarMenuButton>
+
+              <SidebarMenuButton
+                isActive={path.includes('/admin/advertisements')}
+                asChild
+              >
+                <Link
+                  className={'flex size-full gap-2.5'}
+                  href={'/admin/advertisements'}
+                >
+                  <Megaphone className={'h-4'} />
+                  <span>Advertisement Management</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenu>

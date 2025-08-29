@@ -85,8 +85,7 @@ const featuresFlagConfig = FeatureFlagsSchema.parse({
     process.env.NEXT_PUBLIC_ENABLE_TEAM_ACCOUNTS_BILLING,
     false,
   ),
-  languagePriority: process.env
-    .NEXT_PUBLIC_LANGUAGE_PRIORITY as LanguagePriority,
+  languagePriority: (process.env.NEXT_PUBLIC_LANGUAGE_PRIORITY as LanguagePriority) || 'application',
   enableNotifications: getBoolean(
     process.env.NEXT_PUBLIC_ENABLE_NOTIFICATIONS,
     true,

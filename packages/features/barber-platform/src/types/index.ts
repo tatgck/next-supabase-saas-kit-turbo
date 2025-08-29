@@ -5,7 +5,7 @@ export type Workstation = Database['public']['Tables']['workstations']['Row'];
 export type Barber = Database['public']['Tables']['barbers']['Row'];
 export type Advertisement = Database['public']['Tables']['advertisements']['Row'];
 
-export interface StoreWithStats extends Store {
+export interface StoreWithStats extends Omit<Store, 'rating' | 'review_count' | 'monthly_revenue'> {
   barber_count: number;
   workstation_count: number;
   monthly_revenue: number;
@@ -13,14 +13,14 @@ export interface StoreWithStats extends Store {
   review_count: number;
 }
 
-export interface WorkstationWithUsage extends Workstation {
+export interface WorkstationWithUsage extends Omit<Workstation, 'utilization' | 'bookings_count' | 'revenue'> {
   utilization: number;
   bookings_count: number;
   revenue: number;
   current_barber?: string;
 }
 
-export interface BarberWithStats extends Barber {
+export interface BarberWithStats extends Omit<Barber, 'rating' | 'review_count' | 'total_bookings' | 'total_earnings'> {
   rating: number;
   review_count: number;
   total_bookings: number;

@@ -27,7 +27,9 @@ class BarberPlatformApi {
       ...store,
       barber_count: store.barber_count?.[0]?.count || 0,
       workstation_count: store.workstation_count?.[0]?.count || 0,
-      monthly_revenue: store.monthly_revenue || 0
+      monthly_revenue: store.monthly_revenue || 0,
+      rating: store.rating || 0,
+      review_count: store.review_count || 0
     }));
   }
 
@@ -261,6 +263,135 @@ class BarberPlatformApi {
    */
   async toggleBarberAvailability(barberId: string, isAvailable: boolean) {
     return this.updateBarber(barberId, { is_available: isAvailable });
+  }
+
+  /**
+   * 创建理发师邀请
+   */
+  async createBarberInvitation(invitationData: {
+    store_id: string;
+    email: string;
+    name?: string;
+    phone?: string;
+    expires_in_hours?: number;
+  }) {
+    const token = crypto.randomUUID();
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + (invitationData.expires_in_hours || 72));
+
+    const { data, error } = await this.client
+      .from('barber_invitations' as any)
+      .insert([{
+        store_id: invitationData.store_id,
+        email: invitationData.email,
+        name: invitationData.name,
+        phone: invitationData.phone,
+        token,
+        expires_at: expiresAt.toISOString(),
+        created_by: (await this.client.auth.getUser()).data.user?.id
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return { ...data, invite_url: `${process.env.NEXT_PUBLIC_APP_URL}/auth/accept-invitation?token=${token}` };
+  }
+
+  /**
+   * 获取邀请信息
+   */
+  async getInvitationByToken(token: string) {
+    const { data, error } = await this.client
+      .from('barber_invitations' as any)
+      .select('*, store:stores(name, slug)')
+      .eq('token', token)
+      .gte('expires_at', new Date().toISOString())
+      .eq('status', 'pending')
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
+   * 接受邀请并创建理发师
+   */
+  async acceptInvitation(token: string, userData: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+  }) {
+    const { data: invitation, error: inviteError } = await this.client
+      .from('barber_invitations' as any)
+      .update({ 
+        status: 'accepted' as any,
+        accepted_at: new Date().toISOString()
+      })
+      .eq('token', token)
+      .select()
+      .single();
+
+    if (inviteError) {
+      throw inviteError;
+    }
+
+    // 创建理发师记录
+    const { data: barber, error: barberError } = await this.client
+      .from('barbers')
+      .insert([{
+        id: userData.id,
+        store_id: invitation.store_id,
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        invitation_token: token
+      }])
+      .select()
+      .single();
+
+    if (barberError) {
+      throw barberError;
+    }
+
+    return barber;
+  }
+
+  /**
+   * 获取门店的邀请列表
+   */
+  async getStoreInvitations(storeId: string) {
+    const { data, error } = await this.client
+      .from('barber_invitations' as any)
+      .select('*')
+      .eq('store_id', storeId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
+   * 撤销邀请
+   */
+  async revokeInvitation(invitationId: string) {
+    const { error } = await this.client
+      .from('barber_invitations' as any)
+      .update({ status: 'revoked' as any })
+      .eq('id', invitationId);
+
+    if (error) {
+      throw error;
+    }
   }
 }
 

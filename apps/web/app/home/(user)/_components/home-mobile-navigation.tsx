@@ -95,7 +95,7 @@ function DropdownLink(
         {props.Icon}
 
         <span>
-          <Trans i18nKey={props.label} defaults={props.label} />
+          <Trans i18nKey={props.label} />
         </span>
       </Link>
     </DropdownMenuItem>
@@ -115,7 +115,7 @@ function SignOutDropdownItem(
       <LogOut className={'h-6'} />
 
       <span>
-        <Trans i18nKey={'common:signOut'} defaults={'Sign out'} />
+        <Trans i18nKey={'common:signOut'} />
       </span>
     </DropdownMenuItem>
   );

@@ -100,7 +100,7 @@ class BarberPlatformService {
     try {
       logger.info(ctx, 'Updating store with validation...');
 
-      // 首先获取门店信息验证权限
+      // First get store information to validate permissions
       const store = await this.api.getStoreById(storeId);
       
       if (!store) {
@@ -109,7 +109,7 @@ class BarberPlatformService {
         throw error;
       }
 
-      // 验证用户权限 - 只有门店所有者可以更新
+      // Validate user permissions - only store owner can update
       if (store.owner_id !== userId) {
         const error = new Error('Unauthorized: Only store owner can update');
         logger.error({ ...ctx, error }, 'Permission validation failed');
@@ -140,7 +140,7 @@ class BarberPlatformService {
     try {
       logger.info(ctx, 'Deleting store with validation...');
 
-      // 首先获取门店信息验证权限
+      // First get store information to validate permissions
       const store = await this.api.getStoreById(storeId);
       
       if (!store) {
@@ -149,7 +149,7 @@ class BarberPlatformService {
         throw error;
       }
 
-      // 验证用户权限 - 只有门店所有者可以删除
+      // Validate user permissions - only store owner can delete
       if (store.owner_id !== userId) {
         const error = new Error('Unauthorized: Only store owner can delete');
         logger.error({ ...ctx, error }, 'Permission validation failed');
@@ -294,9 +294,9 @@ class BarberPlatformService {
         throw error;
       }
 
-      // 验证权限：理发师自己或门店所有者可以切换状态
+      // Validate permissions: barber themselves or store owner can toggle status
       if (barber.id !== userId && barber.store_id) {
-        // 如果是门店理发师，验证门店所有者权限
+        // If it's a store barber, validate store owner permissions
         const store = await this.api.getStoreById(barber.store_id);
         
         if (!store || store.owner_id !== userId) {

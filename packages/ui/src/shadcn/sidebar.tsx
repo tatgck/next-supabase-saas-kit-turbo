@@ -804,13 +804,13 @@ export function SidebarNavigation({
                   condition={item.collapsible}
                   fallback={
                     <SidebarGroupLabel className={cn({ hidden: !open })}>
-                      <Trans i18nKey={item.label} defaults={item.label} />
+                      <Trans i18nKey={item.label} />
                     </SidebarGroupLabel>
                   }
                 >
                   <SidebarGroupLabel className={cn({ hidden: !open })} asChild>
                     <CollapsibleTrigger>
-                      <Trans i18nKey={item.label} defaults={item.label} />
+                      <Trans i18nKey={item.label} />
                       <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
                     </CollapsibleTrigger>
                   </SidebarGroupLabel>
@@ -877,7 +877,6 @@ export function SidebarNavigation({
                                     >
                                       <Trans
                                         i18nKey={child.label}
-                                        defaults={child.label}
                                       />
                                     </span>
 
@@ -927,7 +926,6 @@ export function SidebarNavigation({
                                 >
                                   <Trans
                                     i18nKey={child.label}
-                                    defaults={child.label}
                                   />
                                 </span>
                               </Link>
@@ -985,7 +983,6 @@ export function SidebarNavigation({
                                                 <span className={spanClassName}>
                                                   <Trans
                                                     i18nKey={child.label}
-                                                    defaults={child.label}
                                                   />
                                                 </span>
                                               </Link>
