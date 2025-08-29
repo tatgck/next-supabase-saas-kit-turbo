@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -59,6 +59,30 @@ export function StoreDialog({
       description: store?.description || '',
     },
   });
+
+  // 当store变化或对话框打开时重置表单值
+  useEffect(() => {
+    if (open) {
+      if (store) {
+        form.reset({
+          name: store.name || '',
+          address: store.address || '',
+          phone: store.phone || '',
+          email: store.email || '',
+          description: store.description || '',
+        });
+      } else {
+        // 如果是新增，清空表单
+        form.reset({
+          name: '',
+          address: '',
+          phone: '',
+          email: '',
+          description: '',
+        });
+      }
+    }
+  }, [store, form, open]);
 
   const handleSubmit = async (data: StoreFormValues) => {
     try {

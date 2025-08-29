@@ -48,10 +48,11 @@ function StoreManagementPage() {
   };
 
   const handleEditStore = (store: any) => {
-    console.log('Editing store:', store);
+    // 先设置store，再打开对话框
     setSelectedStore(store);
     setDialogMode('edit');
-    setDialogOpen(true);
+    // 微延迟确保store先设置
+    setTimeout(() => setDialogOpen(true), 10);
   };
 
   const handleDeleteStore = async (store: any) => {
@@ -104,7 +105,8 @@ function StoreManagementPage() {
   const handleAddStore = () => {
     setSelectedStore(null);
     setDialogMode('create');
-    setDialogOpen(true);
+    // 微延迟确保store先清空
+    setTimeout(() => setDialogOpen(true), 10);
   };
 
   const handleSubmitStore = async (formData: any) => {
