@@ -4,3 +4,5 @@ export { BarbersTable } from './barbers-table';
 export { AdvertisementsTable } from './advertisements-table';
 export { OperationsDashboard } from './operations-dashboard';
 export { AdminBarberPlatformSidebar } from './admin-sidebar';
+export { StoreDialog } from './store-dialog';
+export { StoreDetailsDialog } from './store-details-dialog';

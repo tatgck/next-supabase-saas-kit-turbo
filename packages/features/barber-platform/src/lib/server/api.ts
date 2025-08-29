@@ -147,6 +147,10 @@ class BarberPlatformApi {
       throw error;
     }
 
+    if (!data) {
+      throw new Error(`Store with ID ${storeId} not found or no changes made`);
+    }
+
     return data;
   }
 

@@ -208,7 +208,7 @@ importers:
         version: 0.0.10(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)
       '@makerkit/data-loader-supabase-nextjs':
         specifier: ^1.2.5
-        version: 1.2.5(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)(@tanstack/react-query@5.81.2(react@19.1.0))(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 1.2.5(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)(@tanstack/react-query@5.81.2(react@19.1.0))(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.1)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@marsidev/react-turnstile':
         specifier: ^1.1.0
         version: 1.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -775,7 +775,7 @@ importers:
         version: 0.0.10(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)
       '@makerkit/data-loader-supabase-nextjs':
         specifier: ^1.2.5
-        version: 1.2.5(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)(@tanstack/react-query@5.81.2(react@19.1.0))(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 1.2.5(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)(@tanstack/react-query@5.81.2(react@19.1.0))(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.1)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@supabase/supabase-js':
         specifier: 2.50.2
         version: 2.50.2
@@ -866,6 +866,9 @@ importers:
 
   packages/features/barber-platform:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.9.0
+        version: 3.10.0(react-hook-form@7.58.1(react@19.1.0))
       '@kit/shared':
         specifier: workspace:*
         version: link:../../shared
@@ -887,6 +890,12 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      react-hook-form:
+        specifier: ^7.53.0
+        version: 7.58.1(react@19.1.0)
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.67
     devDependencies:
       '@kit/eslint-config':
         specifier: workspace:*
@@ -1918,6 +1927,11 @@ packages:
     resolution: {integrity: sha512-tMXdRCfYVixjuFK+Hk0Q1s38gV9zDiDJfWL3h1rv4Qc39oILCu1TRTDt7+fGUI8K4G1Fj125Hx/ru3azECWTyQ==}
     engines: {node: '>=6'}
     hasBin: true
+
+  '@hookform/resolvers@3.10.0':
+    resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
 
   '@hookform/resolvers@5.1.1':
     resolution: {integrity: sha512-J/NVING3LMAEvexJkyTLjruSm7aOFx7QX21pzkiJfMoNG0wl5aFEjLTl7ay7IQb9EWY6AkrBy7tHL2Alijpdcg==}
@@ -8892,6 +8906,10 @@ snapshots:
       protobufjs: 7.5.3
       yargs: 17.7.2
 
+  '@hookform/resolvers@3.10.0(react-hook-form@7.58.1(react@19.1.0))':
+    dependencies:
+      react-hook-form: 7.58.1(react@19.1.0)
+
   '@hookform/resolvers@5.1.1(react-hook-form@7.58.1(react@19.1.0))':
     dependencies:
       '@standard-schema/utils': 0.3.0
@@ -9237,7 +9255,7 @@ snapshots:
       '@supabase/supabase-js': 2.50.2
       ts-case-convert: 2.1.0
 
-  '@makerkit/data-loader-supabase-nextjs@1.2.5(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)(@tanstack/react-query@5.81.2(react@19.1.0))(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+  '@makerkit/data-loader-supabase-nextjs@1.2.5(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)(@tanstack/react-query@5.81.2(react@19.1.0))(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.1)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@makerkit/data-loader-supabase-core': 0.0.10(@supabase/postgrest-js@1.19.4)(@supabase/supabase-js@2.50.2)
       '@supabase/supabase-js': 2.50.2

@@ -408,7 +408,7 @@ export const POST = enhanceRouteHandler(
 - Write clean, clear, well-designed, explicit Typescript
 - Use implicit type inference, unless impossible
 - `any` and `unknown` are a code smell and must justified if used
-- Handle errors gracefully using try/catch and appropriate error types. 
+- Handle errors gracefully using try/catch and appropriate error types.
 
 ### Components
 
@@ -616,3 +616,12 @@ async function myServerAction() {
 - [ ] Use Zod schemas for parsing all user input (including cookies, query params, etc.)
 - [ ] Add testing attributes to interactive elements
 - [ ] Validate permissions before sensitive operations
+
+每次新增完功能、页面：
+
+- 测试成功 -> 再返回:完成
+- 测试失败， -> 解决问题
+
+每次运行问答，
+
+- 都要执行：请为你的回答最多预留 8192 tokens 的空间
