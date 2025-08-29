@@ -617,6 +617,10 @@ async function myServerAction() {
 - [ ] Add testing attributes to interactive elements
 - [ ] Validate permissions before sensitive operations
 
+每个功能的页面都要注意：
+
+- 都是默认的语言“英语”，请已主要语言展示为页面功能和细节
+
 每次新增完功能、页面：
 
 - 测试成功 -> 再返回:完成

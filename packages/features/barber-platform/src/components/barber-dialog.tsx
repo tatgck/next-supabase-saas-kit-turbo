@@ -25,13 +25,15 @@ import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
 import { Switch } from '@kit/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@kit/ui/select';
+import { Badge } from '@kit/ui/badge';
+import { X } from 'lucide-react';
 
 const barberFormSchema = z.object({
-  name: z.string().min(1, '理发师姓名是必填项'),
+  name: z.string().min(1, 'Barber name is required'),
   phone: z.string().optional(),
-  email: z.string().email('请输入有效的邮箱地址').optional().or(z.literal('')),
-  experience_years: z.coerce.number().min(0, '经验年限不能为负数').optional(),
-  specialty: z.string().optional(),
+  email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
+  experience_years: z.coerce.number().min(0, 'Experience years cannot be negative').optional(),
+  specialties: z.array(z.string()).default([]),
   description: z.string().optional(),
   is_available: z.boolean().default(true),
 });
@@ -59,14 +61,14 @@ export function BarberDialog({
       name: '',
       phone: '',
       email: '',
-      experience_years: undefined,
-      specialty: '',
+      experience_years: 0,
+      specialties: [],
       description: '',
       is_available: true,
     },
   });
 
-  // 当barber变化或对话框打开时重置表单值
+  // Reset form values when barber changes or dialog opens
   useEffect(() => {
     if (open) {
       if (barber) {
@@ -74,19 +76,19 @@ export function BarberDialog({
           name: barber.name || '',
           phone: barber.phone || '',
           email: barber.email || '',
-          experience_years: barber.experience_years || undefined,
-          specialty: Array.isArray(barber.specialty) ? barber.specialty.join(', ') : barber.specialty || '',
+          experience_years: barber.experience_years || 0,
+          specialties: Array.isArray(barber.specialty) ? barber.specialty : (barber.specialty ? [barber.specialty] : []),
           description: barber.description || '',
           is_available: barber.is_available ?? true,
         });
       } else {
-        // 如果是新增，清空表单
+        // If creating new, clear the form
         form.reset({
           name: '',
           phone: '',
           email: '',
-          experience_years: undefined,
-          specialty: '',
+          experience_years: 0,
+          specialties: [],
           description: '',
           is_available: true,
         });
@@ -94,12 +96,29 @@ export function BarberDialog({
     }
   }, [barber, form, open]);
 
+  const [newSpecialty, setNewSpecialty] = useState('');
+
+  const handleAddSpecialty = () => {
+    if (newSpecialty.trim()) {
+      const currentSpecialties = form.getValues('specialties');
+      if (!currentSpecialties.includes(newSpecialty.trim())) {
+        form.setValue('specialties', [...currentSpecialties, newSpecialty.trim()]);
+      }
+      setNewSpecialty('');
+    }
+  };
+
+  const handleRemoveSpecialty = (specialtyToRemove: string) => {
+    const currentSpecialties = form.getValues('specialties');
+    form.setValue('specialties', currentSpecialties.filter(s => s !== specialtyToRemove));
+  };
+
   const handleSubmit = async (data: BarberFormValues) => {
     try {
-      // 将specialty字符串转换为数组
+      // Use specialties array directly
       const submitData = {
         ...data,
-        specialty: data.specialty ? data.specialty.split(',').map(s => s.trim()).filter(Boolean) : []
+        specialty: data.specialties
       };
       await onSubmit(submitData);
       onOpenChange(false);
@@ -114,12 +133,12 @@ export function BarberDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {barber ? '编辑理发师' : '新增理发师'}
+            {barber ? 'Edit Barber' : 'Add New Barber'}
           </DialogTitle>
           <DialogDescription>
             {barber 
-              ? '更新理发师信息'
-              : '填写理发师详细信息'
+              ? 'Update barber information'
+              : 'Fill in barber details'
             }
           </DialogDescription>
         </DialogHeader>
@@ -131,9 +150,9 @@ export function BarberDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>姓名</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="请输入理发师姓名" {...field} />
+                    <Input placeholder="Enter barber name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,9 +164,9 @@ export function BarberDialog({
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>电话</FormLabel>
+                  <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <Input placeholder="请输入电话号码" {...field} />
+                    <Input placeholder="Enter phone number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -159,9 +178,9 @@ export function BarberDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>邮箱</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="请输入邮箱地址" type="email" {...field} />
+                    <Input placeholder="Enter email address" type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -173,10 +192,10 @@ export function BarberDialog({
               name="experience_years"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>经验年限</FormLabel>
+                  <FormLabel>Experience Years</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="请输入经验年限" 
+                      placeholder="Enter years of experience" 
                       type="number" 
                       min="0"
                       {...field} 
@@ -188,32 +207,55 @@ export function BarberDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="specialty"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>专长</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="请输入专长，多个用逗号分隔" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormItem>
+              <FormLabel>Specialties</FormLabel>
+              <div className="space-y-2">
+                {/* Display added tags */}
+                <div className="flex flex-wrap gap-2">
+                  {form.watch('specialties').map((specialty) => (
+                    <Badge key={specialty} variant="secondary" className="flex items-center gap-1">
+                      {specialty}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSpecialty(specialty)}
+                        className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Input for adding new tags */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add a specialty"
+                    value={newSpecialty}
+                    onChange={(e) => setNewSpecialty(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddSpecialty();
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={handleAddSpecialty} variant="outline">
+                    Add
+                  </Button>
+                </div>
+              </div>
+              <FormMessage />
+            </FormItem>
 
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>描述</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="请输入理发师描述信息" 
+                      placeholder="Enter barber description" 
                       className="resize-none" 
                       {...field} 
                     />
@@ -230,10 +272,10 @@ export function BarberDialog({
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">
-                      可预约状态
+                      Availability
                     </FormLabel>
                     <p className="text-sm text-muted-foreground">
-                      是否允许客户预约该理发师
+                      Allow customers to book this barber
                     </p>
                   </div>
                   <FormControl>
@@ -252,10 +294,10 @@ export function BarberDialog({
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
               >
-                取消
+                Cancel
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? '保存中...' : (barber ? '更新理发师' : '创建理发师')}
+                {loading ? 'Saving...' : (barber ? 'Update Barber' : 'Create Barber')}
               </Button>
             </div>
           </form>

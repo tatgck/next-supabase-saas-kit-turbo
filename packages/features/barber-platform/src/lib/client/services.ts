@@ -17,25 +17,32 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 获取平台运营仪表盘数据
+   * Get platform operation dashboard data
    */
   async getDashboardData() {
     console.info(`[${this.namespace}] Fetching dashboard data...`);
 
     try {
-      const [stores, workstations, barbers] = await Promise.all([
-        this.api.getStoresWithStats(),
-        this.api.getWorkstationsWithUsage(),
-        this.api.getBarbersWithStats()
-      ]);
+      // 使用管理员API获取数据，避免RLS限制
+      const response = await fetch('/api/admin/barbers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'getDashboardData'
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch dashboard data');
+      }
 
       console.info(`[${this.namespace}] Dashboard data fetched successfully`);
-
-      return {
-        stores,
-        workstations,
-        barbers
-      };
+      return result.data;
     } catch (error) {
       console.error(`[${this.namespace}] Failed to fetch dashboard data:`, error);
       throw error;
@@ -43,7 +50,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 创建新门店
+   * Create new store
    */
   async createStore(storeData: {
     name: string;
@@ -62,13 +69,13 @@ class BarberPlatformClientService {
       return result;
     } catch (error) {
       console.error(`[${this.namespace}] Failed to create store:`, error);
-      // 抛出更详细的错误信息
+      // Throw more detailed error message
       throw new Error(`Failed to create store: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
     }
   }
 
   /**
-   * 更新门店信息
+   * Update store information
    */
   async updateStore(storeId: string, updates: any) {
     console.info(`[${this.namespace}] Updating store ${storeId}:`, updates);
@@ -84,7 +91,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 删除门店
+   * Delete store
    */
   async deleteStore(storeId: string) {
     console.info(`[${this.namespace}] Deleting store:`, storeId);
@@ -99,7 +106,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 批准门店
+   * Approve store
    */
   async approveStore(storeId: string) {
     console.info(`[${this.namespace}] Approving store:`, storeId);
@@ -115,7 +122,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 拒绝门店
+   * Reject store
    */
   async rejectStore(storeId: string) {
     console.info(`[${this.namespace}] Rejecting store:`, storeId);
@@ -131,7 +138,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 创建理发师
+   * Create barber
    */
   async createBarber(barberData: {
     name: string;
@@ -157,10 +164,24 @@ class BarberPlatformClientService {
         }),
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        const responseText = await response.text();
+        console.log(`[${this.namespace}] Raw API response:`, responseText);
+        result = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error(`[${this.namespace}] Failed to parse API response:`, parseError);
+        throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`);
+      }
       
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to create barber');
+      if (!response.ok || !result.success) {
+        console.error(`[${this.namespace}] Create barber API error:`, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          result: result
+        });
+        throw new Error(result.error || `Failed to create barber: ${response.status} ${response.statusText}`);
       }
 
       console.info(`[${this.namespace}] Barber created successfully:`, result.data.id);
@@ -172,7 +193,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 更新理发师信息
+   * Update barber information
    */
   async updateBarber(barberId: string, updates: any) {
     console.info(`[${this.namespace}] Updating barber ${barberId}:`, updates);
@@ -190,10 +211,34 @@ class BarberPlatformClientService {
         }),
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        const responseText = await response.text();
+        console.log(`[${this.namespace}] Raw update API response:`, responseText);
+        result = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error(`[${this.namespace}] Failed to parse update API response:`, parseError);
+        throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`);
+      }
       
+      if (!response.ok) {
+        console.error(`[${this.namespace}] Update barber API error:`, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          result: result
+        });
+        throw new Error(result.error || `Failed to update barber: ${response.status} ${response.statusText}`);
+      }
+
       if (!result.success) {
-        throw new Error(result.error || 'Failed to update barber');
+        console.error(`[${this.namespace}] Update barber API error:`, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          result: result
+        });
+        throw new Error(result.error || `Failed to update barber: API returned unsuccessful result`);
       }
 
       console.info(`[${this.namespace}] Barber updated successfully:`, barberId);
@@ -205,7 +250,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 删除理发师
+   * Delete barber
    */
   async deleteBarber(barberId: string) {
     console.info(`[${this.namespace}] Deleting barber:`, barberId);
@@ -237,7 +282,7 @@ class BarberPlatformClientService {
   }
 
   /**
-   * 切换理发师可用状态
+   * Toggle barber availability
    */
   async toggleBarberAvailability(barberId: string, isAvailable: boolean) {
     console.info(`[${this.namespace}] Toggling barber availability:`, barberId, isAvailable);

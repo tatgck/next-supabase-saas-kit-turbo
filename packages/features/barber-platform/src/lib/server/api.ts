@@ -7,7 +7,7 @@ class BarberPlatformApi {
   constructor(private readonly client: SupabaseClient<Database>) {}
 
   /**
-   * 获取门店列表及统计信息
+   * Get store list with statistics
    */
   async getStoresWithStats(): Promise<StoreWithStats[]> {
     const { data, error } = await this.client
@@ -34,7 +34,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 获取工位列表及使用统计
+   * Get workstation list with usage statistics
    */
   async getWorkstationsWithUsage(storeId?: string): Promise<WorkstationWithUsage[]> {
     let query = this.client
@@ -55,7 +55,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 获取理发师列表及统计信息
+   * Get barber list with statistics
    */
   async getBarbersWithStats(storeId?: string): Promise<BarberWithStats[]> {
     let query = this.client
@@ -76,7 +76,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 获取单个门店详情
+   * Get single store details
    */
   async getStoreById(storeId: string): Promise<StoreWithStats | null> {
     const { data, error } = await this.client
@@ -105,7 +105,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 创建新门店
+   * Create new store
    */
   async createStore(storeData: {
     name: string;
@@ -133,7 +133,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 创建理发师
+   * Create barber
    */
   async createBarber(barberData: {
     name: string;
@@ -144,28 +144,35 @@ class BarberPlatformApi {
     description?: string;
     is_available?: boolean;
   }) {
-    // 生成UUID作为理发师ID
-    const barberId = crypto.randomUUID();
+    console.log('Creating barber with data:', barberData);
     
-    const { data, error } = await this.client
-      .from('barbers')
-      .insert([{
-        id: barberId,
-        ...barberData,
-        is_available: barberData.is_available ?? true
-      }])
-      .select()
-      .single();
+    try {
+      // 对于管理员创建理发师，使用数据库的默认UUID生成而不是auth.uid()
+      const { data, error } = await this.client
+        .from('barbers')
+        .insert([{
+          ...barberData,
+          id: undefined, // 让数据库使用默认的UUID生成
+          is_available: barberData.is_available ?? true
+        }])
+        .select()
+        .single();
 
-    if (error) {
+      if (error) {
+        console.error('Database error creating barber:', error);
+        throw error;
+      }
+
+      console.log('Barber created successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in createBarber:', error);
       throw error;
     }
-
-    return data;
   }
 
   /**
-   * 更新门店信息
+   * Update store information
    */
   async updateStore(storeId: string, updates: Partial<Database['public']['Tables']['stores']['Update']>) {
     const { data, error } = await this.client
@@ -187,7 +194,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 删除门店
+   * Delete store
    */
   async deleteStore(storeId: string) {
     const { error } = await this.client
@@ -201,21 +208,21 @@ class BarberPlatformApi {
   }
 
   /**
-   * 批准门店
+   * Approve store
    */
   async approveStore(storeId: string) {
     return this.updateStore(storeId, { status: 'active' });
   }
 
   /**
-   * 拒绝门店
+   * Reject store
    */
   async rejectStore(storeId: string) {
     return this.updateStore(storeId, { status: 'inactive' });
   }
 
   /**
-   * 创建工位
+   * Create workstation
    */
   async createWorkstation(workstationData: {
     store_id: string;
@@ -239,7 +246,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 更新工位信息
+   * Update workstation information
    */
   async updateWorkstation(workstationId: string, updates: Partial<Database['public']['Tables']['workstations']['Update']>) {
     const { data, error } = await this.client
@@ -257,7 +264,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 分配理发师到工位
+   * Assign barber to workstation
    */
   async assignBarberToWorkstation(workstationId: string, barberId: string) {
     return this.updateWorkstation(workstationId, {
@@ -267,7 +274,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 释放工位
+   * Release workstation
    */
   async releaseWorkstation(workstationId: string) {
     return this.updateWorkstation(workstationId, {
@@ -277,29 +284,51 @@ class BarberPlatformApi {
   }
 
   /**
-   * 更新理发师信息
+   * Update barber information
    */
-  async updateBarber(barberId: string, updates: Partial<Database['public']['Tables']['barbers']['Update']>) {
-    const { data, error } = await this.client
-      .from('barbers')
-      .update(updates)
-      .eq('id', barberId)
-      .select()
-      .single();
+  async updateBarber(barberId: string, updates: any) {
+    console.log('Updating barber in database:', barberId, updates);
+    
+    try {
+      // 过滤掉不存在的字段（如 specialties -> specialty）
+      const validUpdates: Partial<Database['public']['Tables']['barbers']['Update']> = {};
+      
+      if (updates.name !== undefined) validUpdates.name = updates.name;
+      if (updates.phone !== undefined) validUpdates.phone = updates.phone;
+      if (updates.email !== undefined) validUpdates.email = updates.email;
+      if (updates.experience_years !== undefined) validUpdates.experience_years = updates.experience_years;
+      if (updates.specialty !== undefined) validUpdates.specialty = updates.specialty;
+      if (updates.specialties !== undefined) validUpdates.specialty = updates.specialties; // 处理 specialties -> specialty 映射
+      if (updates.description !== undefined) validUpdates.description = updates.description;
+      if (updates.is_available !== undefined) validUpdates.is_available = updates.is_available;
 
-    if (error) {
+      const { data, error } = await this.client
+        .from('barbers')
+        .update(validUpdates)
+        .eq('id', barberId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Database error updating barber:', error);
+        throw error;
+      }
+
+      if (!data) {
+        console.error(`Barber with ID ${barberId} not found or no changes made`);
+        throw new Error(`Barber with ID ${barberId} not found or no changes made`);
+      }
+
+      console.log('Barber updated successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in updateBarber:', error);
       throw error;
     }
-
-    if (!data) {
-      throw new Error(`Barber with ID ${barberId} not found or no changes made`);
-    }
-
-    return data;
   }
 
   /**
-   * 删除理发师
+   * Delete barber
    */
   async deleteBarber(barberId: string) {
     const { error } = await this.client
@@ -313,14 +342,14 @@ class BarberPlatformApi {
   }
 
   /**
-   * 切换理发师可用状态
+   * Toggle barber availability
    */
   async toggleBarberAvailability(barberId: string, isAvailable: boolean) {
     return this.updateBarber(barberId, { is_available: isAvailable });
   }
 
   /**
-   * 创建理发师邀请
+   * Create barber invitation
    */
   async createBarberInvitation(invitationData: {
     store_id: string;
@@ -355,7 +384,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 获取邀请信息
+   * Get invitation information
    */
   async getInvitationByToken(token: string) {
     const { data, error } = await this.client
@@ -374,7 +403,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 接受邀请并创建理发师
+   * Accept invitation and create barber
    */
   async acceptInvitation(token: string, userData: {
     id: string;
@@ -418,7 +447,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 获取门店的邀请列表
+   * Get store invitation list
    */
   async getStoreInvitations(storeId: string) {
     const { data, error } = await this.client
@@ -435,7 +464,7 @@ class BarberPlatformApi {
   }
 
   /**
-   * 撤销邀请
+   * Revoke invitation
    */
   async revokeInvitation(invitationId: string) {
     const { error } = await this.client

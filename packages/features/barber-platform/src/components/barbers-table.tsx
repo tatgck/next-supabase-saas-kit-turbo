@@ -111,11 +111,11 @@ export function BarbersTable({
                     <CardTitle className="text-lg">{barber.name}</CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant={barber.is_available ? 'success' : 'destructive'}>
-                        {barber.is_available ? '可预约' : '不可预约'}
+                        {barber.is_available ? 'Available' : 'Unavailable'}
                       </Badge>
                       {barber.experience_years && (
                         <Badge variant="secondary">
-                          {barber.experience_years}年经验
+                          {barber.experience_years} years
                         </Badge>
                       )}
                     </div>
@@ -175,7 +175,7 @@ export function BarbersTable({
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-2" />
                       <span className="font-medium">{barber.rating}</span>
                       <span className="text-sm text-muted-foreground ml-1">
-                        ({barber.review_count}评价)
+                        ({barber.review_count} reviews)
                       </span>
                     </div>
                   )}
@@ -230,13 +230,13 @@ export function BarbersTable({
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-4">理发师信息</th>
-                  <th className="text-left p-4">状态</th>
-                  <th className="text-left p-4">评分</th>
-                  <th className="text-left p-4">经验</th>
-                  <th className="text-left p-4">总预约</th>
-                  <th className="text-left p-4">总收入</th>
-                  <th className="text-left p-4">操作</th>
+                  <th className="text-left p-4">Barber Info</th>
+                  <th className="text-left p-4">Status</th>
+                  <th className="text-left p-4">Rating</th>
+                  <th className="text-left p-4">Experience</th>
+                  <th className="text-left p-4">Total Bookings</th>
+                  <th className="text-left p-4">Total Earnings</th>
+                  <th className="text-left p-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -252,7 +252,7 @@ export function BarbersTable({
                     </td>
                     <td className="p-4">
                       <Badge variant={barber.is_available ? 'success' : 'destructive'}>
-                        {barber.is_available ? '可预约' : '不可预约'}
+                        {barber.is_available ? 'Available' : 'Unavailable'}
                       </Badge>
                     </td>
                     <td className="p-4">

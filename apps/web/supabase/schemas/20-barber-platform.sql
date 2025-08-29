@@ -80,7 +80,7 @@ create type public.barber_invitation_status as enum('pending', 'accepted', 'expi
 
 -- 理发师表
 create table if not exists public.barbers (
-  id uuid default auth.uid() primary key,
+  id uuid default extensions.uuid_generate_v4() primary key,
   store_id uuid references public.stores on delete cascade,
   name varchar(255) not null,
   phone varchar(20),
@@ -169,6 +169,9 @@ create policy "stores_insert" on public.stores for insert to authenticated with 
 create policy "stores_update" on public.stores for update to authenticated using (auth.uid() = owner_id);
 create policy "stores_delete" on public.stores for delete to authenticated using (auth.uid() = owner_id);
 
+-- 允许服务角色（管理员）完全访问门店
+create policy "stores_service_role_full_access" on public.stores for all to service_role using (true);
+
 -- 工位RLS策略
 create policy "workstations_read" on public.workstations for select to authenticated using (true);
 create policy "workstations_manage" on public.workstations for all to authenticated 
@@ -178,6 +181,9 @@ create policy "workstations_manage" on public.workstations for all to authentica
 create policy "barbers_read" on public.barbers for select to authenticated using (true);
 create policy "barbers_manage" on public.barbers for all to authenticated 
   using (id = auth.uid() or exists (select 1 from public.stores where id = store_id and owner_id = auth.uid()));
+
+-- 允许服务角色（管理员）完全访问
+create policy "barbers_service_role_full_access" on public.barbers for all to service_role using (true);
 
 -- 理发师邀请RLS策略
 create policy "barber_invitations_read" on public.barber_invitations for select to authenticated 

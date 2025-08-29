@@ -48,15 +48,15 @@ function BarberManagementPage() {
   };
 
   const handleEditBarber = (barber: any) => {
-    // 先设置barber，再打开对话框
+    // Set barber first, then open dialog
     setSelectedBarber(barber);
     setDialogMode('edit');
-    // 微延迟确保barber先设置
+    // Small delay to ensure barber is set first
     setTimeout(() => setDialogOpen(true), 10);
   };
 
   const handleDeleteBarber = async (barber: any) => {
-    if (confirm(`确定要删除理发师 "${barber.name}" 吗？`)) {
+    if (confirm(`Are you sure you want to delete barber "${barber.name}"?`)) {
       try {
         const client = getSupabaseBrowserClient();
         const service = createBarberPlatformClientService(client);
@@ -67,7 +67,7 @@ function BarberManagementPage() {
         setBarbers(data.barbers);
       } catch (error) {
         console.error('Failed to delete barber:', error);
-        alert('删除理发师失败');
+        alert('Failed to delete barber');
       }
     }
   };
@@ -83,14 +83,14 @@ function BarberManagementPage() {
       setBarbers(data.barbers);
     } catch (error) {
       console.error('Failed to toggle availability:', error);
-      alert('更新可用状态失败');
+      alert('Failed to update availability status');
     }
   };
 
   const handleAddBarber = () => {
     setSelectedBarber(null);
     setDialogMode('create');
-    // 微延迟确保barber先清空
+    // Small delay to ensure barber is cleared first
     setTimeout(() => setDialogOpen(true), 10);
   };
 
@@ -112,7 +112,7 @@ function BarberManagementPage() {
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to submit barber:', error);
-      alert(`提交理发师信息失败: ${error instanceof Error ? error.message : '未知错误'}`);
+      alert(`Failed to submit barber information: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setSubmitting(false);
     }

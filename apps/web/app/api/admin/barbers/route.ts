@@ -7,7 +7,7 @@ import { createBarberPlatformApi } from '@kit/barber-platform/api';
 
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户是否为超级管理员
+    // Verify user is super admin
     const client = getSupabaseServerClient();
     const userIsSuperAdmin = await isSuperAdmin(client);
     
@@ -25,13 +25,25 @@ export async function POST(request: NextRequest) {
     
     switch (action) {
       case 'create':
+        console.log('API create barber request:', data);
         const createdBarber = await api.createBarber(data);
+        console.log('API create barber success:', createdBarber);
         return NextResponse.json({ success: true, data: createdBarber });
         
       case 'update':
         const { id, updates } = data;
-        const updatedBarber = await api.updateBarber(id, updates);
-        return NextResponse.json({ success: true, data: updatedBarber });
+        console.log('Updating barber:', id, updates);
+        try {
+          const updatedBarber = await api.updateBarber(id, updates);
+          console.log('Barber updated successfully:', updatedBarber);
+          return NextResponse.json({ success: true, data: updatedBarber });
+        } catch (updateError) {
+          console.error('Error updating barber:', updateError);
+          return NextResponse.json({ 
+            success: false, 
+            error: updateError instanceof Error ? updateError.message : 'Failed to update barber' 
+          }, { status: 500 });
+        }
         
       case 'delete':
         await api.deleteBarber(data.id);
@@ -42,18 +54,33 @@ export async function POST(request: NextRequest) {
         const toggledBarber = await api.toggleBarberAvailability(barberId, isAvailable);
         return NextResponse.json({ success: true, data: toggledBarber });
         
+      case 'getBarbers':
+        const barbersList = await api.getBarbersWithStats();
+        return NextResponse.json({ success: true, data: barbersList });
+        
+      case 'getDashboardData':
+        const [stores, workstations, barbersData] = await Promise.all([
+          api.getStoresWithStats(),
+          api.getWorkstationsWithUsage(),
+          api.getBarbersWithStats()
+        ]);
+        return NextResponse.json({ success: true, data: { stores, workstations, barbers: barbersData } });
+        
       default:
         return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
     console.error('Admin barber API error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error',
-        details: error instanceof Error ? error.stack : undefined
-      }, 
-      { status: 500 }
-    );
+    
+    // 确保返回有效的 JSON 响应
+    const errorResponse = {
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      details: error instanceof Error ? error.stack : undefined
+    };
+    
+    console.log('Returning error response:', errorResponse);
+    
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }
