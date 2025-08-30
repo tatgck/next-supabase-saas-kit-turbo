@@ -36,7 +36,7 @@ class BarberPlatformClientService {
       });
 
       const result = await response.json();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch dashboard data');
       }
@@ -173,7 +173,7 @@ class BarberPlatformClientService {
         console.error(`[${this.namespace}] Failed to parse API response:`, parseError);
         throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`);
       }
-      
+
       if (!response.ok || !result.success) {
         console.error(`[${this.namespace}] Create barber API error:`, {
           status: response.status,
@@ -220,7 +220,7 @@ class BarberPlatformClientService {
         console.error(`[${this.namespace}] Failed to parse update API response:`, parseError);
         throw new Error(`Failed to parse API response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`);
       }
-      
+
       if (!response.ok) {
         console.error(`[${this.namespace}] Update barber API error:`, {
           status: response.status,
@@ -269,7 +269,7 @@ class BarberPlatformClientService {
       });
 
       const result = await response.json();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to delete barber');
       }
@@ -301,7 +301,7 @@ class BarberPlatformClientService {
       });
 
       const result = await response.json();
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Failed to toggle barber availability');
       }
@@ -311,6 +311,62 @@ class BarberPlatformClientService {
     } catch (error) {
       console.error(`[${this.namespace}] Failed to toggle barber availability:`, error);
       throw new Error(`Failed to toggle barber availability: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+    }
+  }
+
+  /**
+   * Update workstation information
+   */
+  async updateWorkstation(workstationId: string, updates: any) {
+    console.info(`[${this.namespace}] Updating workstation ${workstationId}:`, updates);
+
+    try {
+      const result = await this.api.updateWorkstation(workstationId, updates);
+      console.info(`[${this.namespace}] Workstation updated successfully:`, workstationId);
+      return result;
+    } catch (error) {
+      console.error(`[${this.namespace}] Failed to update workstation:`, error);
+      throw new Error(`Failed to update workstation: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+    }
+  }
+
+  /**
+   * Assign barber to workstation
+   */
+  async assignBarberToWorkstation(workstationId: string, barberId: string) {
+    console.info(`[${this.namespace}] Assigning barber to workstation:`, workstationId, barberId);
+
+    try {
+      const result = await this.api.assignBarberToWorkstation(workstationId, barberId);
+      console.info(`[${this.namespace}] Barber assigned successfully:`, workstationId);
+      return result;
+    } catch (error) {
+      console.error(`[${this.namespace}] Failed to assign barber:`, error);
+      throw new Error(`Failed to assign barber: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+    }
+  }
+
+  /**
+   * Create workstation
+   */
+  async createWorkstation(workstationData: {
+    store_id: string;
+    number: string;
+    type: 'standard' | 'premium' | 'vip';
+    is_shared?: boolean;
+    shared_start_date?: string;
+    shared_end_date?: string;
+    equipment?: string[];
+  }) {
+    console.info(`[${this.namespace}] Creating new workstation:`, workstationData.number);
+
+    try {
+      const result = await this.api.createWorkstation(workstationData);
+      console.info(`[${this.namespace}] Workstation created successfully:`, result.id);
+      return result;
+    } catch (error) {
+      console.error(`[${this.namespace}] Failed to create workstation:`, error);
+      throw new Error(`Failed to create workstation: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
     }
   }
 }

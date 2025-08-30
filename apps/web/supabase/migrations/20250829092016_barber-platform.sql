@@ -135,6 +135,10 @@ create table "public"."workstations" (
     "status" workstation_status not null default 'available'::workstation_status,
     "hourly_rate" numeric(8,2) not null,
     "daily_rate" numeric(8,2) not null,
+    "discount_percentage" numeric(5,2) default 0,
+    "is_shared" boolean default false not null,
+    "shared_start_date" timestamp with time zone,
+    "shared_end_date" timestamp with time zone,
     "equipment" text[],
     "current_barber_id" uuid,
     "utilization" integer default 0,
@@ -182,6 +186,8 @@ CREATE INDEX idx_support_tickets_user_id ON public.support_tickets USING btree (
 CREATE INDEX idx_workstations_status ON public.workstations USING btree (status);
 
 CREATE INDEX idx_workstations_store_id ON public.workstations USING btree (store_id);
+
+CREATE INDEX idx_workstations_is_shared ON public.workstations USING btree (is_shared);
 
 CREATE UNIQUE INDEX stores_pkey ON public.stores USING btree (id);
 

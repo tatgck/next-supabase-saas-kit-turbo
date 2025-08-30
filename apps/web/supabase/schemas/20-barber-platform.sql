@@ -64,6 +64,13 @@ create table if not exists public.workstations (
   status public.workstation_status default 'available' not null,
   hourly_rate numeric(8,2) not null,
   daily_rate numeric(8,2) not null,
+  discount_percentage numeric(5,2) default 0,
+  is_discount_active boolean default false not null,
+  discount_start_date timestamptz,
+  discount_end_date timestamptz,
+  is_shared boolean default false not null,
+  shared_start_date timestamptz,
+  shared_end_date timestamptz,
   equipment text[],
   current_barber_id uuid references auth.users,
   utilization integer default 0,
@@ -73,6 +80,36 @@ create table if not exists public.workstations (
   next_booking timestamptz,
   created_at timestamptz default current_timestamp,
   updated_at timestamptz default current_timestamp
+);
+
+-- 工位可预约时间段表
+create table if not exists public.workstation_booking_slots (
+  id uuid default extensions.uuid_generate_v4() primary key,
+  workstation_id uuid references public.workstations on delete cascade not null,
+  day_of_week integer not null check (day_of_week between 0 and 6), -- 0=Sunday, 6=Saturday
+  start_time time not null,
+  end_time time not null,
+  max_bookings integer default 1,
+  is_active boolean default true not null,
+  created_at timestamptz default current_timestamp,
+  updated_at timestamptz default current_timestamp,
+  constraint valid_time_range check (start_time < end_time)
+);
+
+-- 工位预约表
+create table if not exists public.workstation_bookings (
+  id uuid default extensions.uuid_generate_v4() primary key,
+  workstation_id uuid references public.workstations on delete cascade not null,
+  barber_id uuid references auth.users not null,
+  booking_date date not null,
+  start_time time not null,
+  end_time time not null,
+  status public.workstation_status default 'reserved' not null,
+  total_amount numeric(8,2) not null,
+  notes text,
+  created_at timestamptz default current_timestamp,
+  updated_at timestamptz default current_timestamp,
+  constraint valid_booking_time check (start_time < end_time)
 );
 
 -- 理发师邀请状态枚举
@@ -177,6 +214,19 @@ create policy "workstations_read" on public.workstations for select to authentic
 create policy "workstations_manage" on public.workstations for all to authenticated 
   using (exists (select 1 from public.stores where id = store_id and owner_id = auth.uid()));
 
+-- 工位可预约时间段RLS策略
+create policy "workstation_booking_slots_read" on public.workstation_booking_slots for select to authenticated using (true);
+create policy "workstation_booking_slots_manage" on public.workstation_booking_slots for all to authenticated 
+  using (exists (select 1 from public.workstations w join public.stores s on w.store_id = s.id where w.id = workstation_id and s.owner_id = auth.uid()));
+
+-- 工位预约RLS策略
+create policy "workstation_bookings_read" on public.workstation_bookings for select to authenticated 
+  using (barber_id = auth.uid() or exists (select 1 from public.workstations w join public.stores s on w.store_id = s.id where w.id = workstation_id and s.owner_id = auth.uid()));
+create policy "workstation_bookings_insert" on public.workstation_bookings for insert to authenticated 
+  with check (barber_id = auth.uid());
+create policy "workstation_bookings_update" on public.workstation_bookings for update to authenticated 
+  using (barber_id = auth.uid() or exists (select 1 from public.workstations w join public.stores s on w.store_id = s.id where w.id = workstation_id and s.owner_id = auth.uid()));
+
 -- 理发师RLS策略
 create policy "barbers_read" on public.barbers for select to authenticated using (true);
 create policy "barbers_manage" on public.barbers for all to authenticated 
@@ -207,6 +257,12 @@ create index idx_stores_owner_id on public.stores(owner_id);
 create index idx_stores_status on public.stores(status);
 create index idx_workstations_store_id on public.workstations(store_id);
 create index idx_workstations_status on public.workstations(status);
+create index idx_workstations_is_shared on public.workstations(is_shared);
+create index idx_workstation_booking_slots_workstation_id on public.workstation_booking_slots(workstation_id);
+create index idx_workstation_booking_slots_day_of_week on public.workstation_booking_slots(day_of_week);
+create index idx_workstation_bookings_workstation_id on public.workstation_bookings(workstation_id);
+create index idx_workstation_bookings_barber_id on public.workstation_bookings(barber_id);
+create index idx_workstation_bookings_booking_date on public.workstation_bookings(booking_date);
 create index idx_barbers_store_id on public.barbers(store_id);
 create index idx_barbers_invitation_token on public.barbers(invitation_token);
 create index idx_barber_invitations_token on public.barber_invitations(token);
@@ -230,6 +286,12 @@ create trigger update_stores_updated_at before update on public.stores
   for each row execute function public.update_updated_at();
 
 create trigger update_workstations_updated_at before update on public.workstations
+  for each row execute function public.update_updated_at();
+
+create trigger update_workstation_booking_slots_updated_at before update on public.workstation_booking_slots
+  for each row execute function public.update_updated_at();
+
+create trigger update_workstation_bookings_updated_at before update on public.workstation_bookings
   for each row execute function public.update_updated_at();
 
 create trigger update_barbers_updated_at before update on public.barbers

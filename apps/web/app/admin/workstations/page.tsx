@@ -6,73 +6,68 @@ import { Trans } from '@kit/ui/trans';
 import { Button } from '@kit/ui/button';
 import { Plus } from 'lucide-react';
 
-import { WorkstationsTable } from '@kit/barber-platform/components';
+import { WorkstationsTable, WorkstationCreateDialog } from '@kit/barber-platform/components';
 import { createBarberPlatformClientService } from '@kit/barber-platform/client/services';
 import { getSupabaseBrowserClient } from '@kit/supabase/browser-client';
 
 function WorkstationManagementPage() {
   const [workstations, setWorkstations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useEffect(() => {
-    async function loadWorkstations() {
-      try {
-        const client = getSupabaseBrowserClient();
-        const service = createBarberPlatformClientService(client);
-        const data = await service.getDashboardData();
-        setWorkstations(data.workstations);
-      } catch (error) {
-        console.error('Failed to load workstations:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     loadWorkstations();
   }, []);
 
-  const handleViewWorkstation = (workstation: any) => {
-    console.log('View workstation:', workstation);
-  };
-
-  const handleEditWorkstation = (workstation: any) => {
-    console.log('Edit workstation:', workstation);
-  };
-
-  const handleDeleteWorkstation = (workstation: any) => {
-    console.log('Delete workstation:', workstation);
-  };
-
-  const handleAssignBarber = (workstation: any) => {
-    console.log('Assign barber to workstation:', workstation);
+  const loadWorkstations = async () => {
+    try {
+      const client = getSupabaseBrowserClient();
+      const service = createBarberPlatformClientService(client);
+      const data = await service.getDashboardData();
+      setWorkstations(data.workstations);
+    } catch (error) {
+      console.error('Failed to load workstations:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddWorkstation = () => {
-    console.log('Add new workstation');
+    setCreateDialogOpen(true);
   };
 
   return (
     <>
       <PageHeader
-        title={<Trans i18nKey="barber:workstations.title" />}
-        description={<Trans i18nKey="barber:workstations.description" />}
+        title={<Trans i18nKey="workstations:title" />}
+        description={<Trans i18nKey="workstations:description" />}
       >
         <Button onClick={handleAddWorkstation}>
           <Plus className="h-4 w-4 mr-2" />
-          <Trans i18nKey="barber:workstations.addNew" />
+          <Trans i18nKey="workstations:addNew" />
         </Button>
       </PageHeader>
 
       <PageBody>
-        <WorkstationsTable 
-          workstations={workstations}
-          loading={loading}
-          onViewWorkstation={handleViewWorkstation}
-          onEditWorkstation={handleEditWorkstation}
-          onDeleteWorkstation={handleDeleteWorkstation}
-          onAssignBarber={handleAssignBarber}
-        />
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-muted-foreground">
+              <Trans i18nKey="common:loading" />
+            </div>
+          </div>
+        ) : (
+          <WorkstationsTable 
+            workstations={workstations}
+            onRefresh={loadWorkstations}
+          />
+        )}
       </PageBody>
+
+      <WorkstationCreateDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={loadWorkstations}
+      />
     </>
   );
 }

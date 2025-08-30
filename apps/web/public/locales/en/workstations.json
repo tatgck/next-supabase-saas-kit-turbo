@@ -1,0 +1,61 @@
+{
+  "title": "Workstation Management",
+  "description": "Manage workstations and booking slots",
+  "addNew": "Add New Workstation",
+  
+  "table": {
+    "number": "Number",
+    "type": "Type",
+    "status": "Status",
+    "shared": "Shared",
+    "hourlyRate": "Hourly Rate",
+    "dailyRate": "Daily Rate",
+    "utilization": "Utilization",
+    "empty": "No workstations available"
+  },
+  
+  "details": {
+    "title": "Workstation {{number}} Details",
+    "basicInfo": "Basic Information",
+    "pricing": "Pricing",
+    "performance": "Performance",
+    "bookingsCount": "Bookings Count",
+    "revenue": "Revenue",
+    "lastUsed": "Last Used",
+    "nextBooking": "Next Booking",
+    "sharingPeriod": "Sharing Period",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "equipment": "Equipment",
+    "discount": "Discount"
+  },
+  
+  "edit": {
+    "title": "Edit Workstation {{number}}"
+  },
+  
+  "assign": {
+    "title": "Assign Barber to Workstation {{number}}",
+    "selectBarber": "Select Barber"
+  },
+  
+  "bookingSlots": {
+    "title": "Booking Slots for Workstation {{number}}",
+    "availableSlots": "Available Booking Slots",
+    "addSlot": "Add Slot",
+    "noSlots": "No booking slots configured"
+  },
+  
+  "form": {
+    "number": "Workstation Number",
+    "type": "Workstation Type",
+    "hourlyRate": "Hourly Rate",
+    "dailyRate": "Daily Rate",
+    "discount": "Discount Percentage",
+    "discountDescription": "Discount applied to bookings (0-100%)",
+    "sharedWorkstation": "Shared Workstation",
+    "sharedDescription": "Allow other barbers to book this workstation during specified times",
+    "sharingStartDate": "Sharing Start Date",
+    "sharingEndDate": "Sharing End Date"
+  }
+}

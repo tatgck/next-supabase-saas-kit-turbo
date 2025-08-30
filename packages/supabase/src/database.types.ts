@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
-          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
+          extensions?: Json
         }
         Returns: Json
       }
@@ -208,6 +208,59 @@ export type Database = {
         }
         Relationships: []
       }
+      barber_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          created_by: string
+          email: string
+          expires_at: string
+          id: string
+          name: string | null
+          phone: string | null
+          status: Database["public"]["Enums"]["barber_invitation_status"]
+          store_id: string
+          token: string
+          updated_at: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          created_by: string
+          email: string
+          expires_at: string
+          id?: string
+          name?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["barber_invitation_status"]
+          store_id: string
+          token: string
+          updated_at?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          created_by?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          name?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["barber_invitation_status"]
+          store_id?: string
+          token?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_invitations_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       barbers: {
         Row: {
           avatar_url: string | null
@@ -216,6 +269,8 @@ export type Database = {
           email: string | null
           experience_years: number | null
           id: string
+          invitation_expires_at: string | null
+          invitation_token: string | null
           is_available: boolean | null
           name: string
           phone: string | null
@@ -234,6 +289,8 @@ export type Database = {
           email?: string | null
           experience_years?: number | null
           id?: string
+          invitation_expires_at?: string | null
+          invitation_token?: string | null
           is_available?: boolean | null
           name: string
           phone?: string | null
@@ -252,6 +309,8 @@ export type Database = {
           email?: string | null
           experience_years?: number | null
           id?: string
+          invitation_expires_at?: string | null
+          invitation_token?: string | null
           is_available?: boolean | null
           name?: string
           phone?: string | null
@@ -921,13 +980,17 @@ export type Database = {
           created_at: string | null
           current_barber_id: string | null
           daily_rate: number
+          discount_percentage: number | null
           equipment: string[] | null
           hourly_rate: number
           id: string
+          is_shared: boolean
           last_used: string | null
           next_booking: string | null
           number: string
           revenue: number | null
+          shared_end_date: string | null
+          shared_start_date: string | null
           status: Database["public"]["Enums"]["workstation_status"]
           store_id: string
           type: Database["public"]["Enums"]["workstation_type"]
@@ -939,13 +1002,17 @@ export type Database = {
           created_at?: string | null
           current_barber_id?: string | null
           daily_rate: number
+          discount_percentage?: number | null
           equipment?: string[] | null
           hourly_rate: number
           id?: string
+          is_shared?: boolean
           last_used?: string | null
           next_booking?: string | null
           number: string
           revenue?: number | null
+          shared_end_date?: string | null
+          shared_start_date?: string | null
           status?: Database["public"]["Enums"]["workstation_status"]
           store_id: string
           type?: Database["public"]["Enums"]["workstation_type"]
@@ -957,13 +1024,17 @@ export type Database = {
           created_at?: string | null
           current_barber_id?: string | null
           daily_rate?: number
+          discount_percentage?: number | null
           equipment?: string[] | null
           hourly_rate?: number
           id?: string
+          is_shared?: boolean
           last_used?: string | null
           next_booking?: string | null
           number?: string
           revenue?: number | null
+          shared_end_date?: string | null
+          shared_start_date?: string | null
           status?: Database["public"]["Enums"]["workstation_status"]
           store_id?: string
           type?: Database["public"]["Enums"]["workstation_type"]
@@ -1044,12 +1115,12 @@ export type Database = {
       }
       create_nonce: {
         Args: {
+          p_user_id?: string
+          p_purpose?: string
           p_expires_in_seconds?: number
           p_metadata?: Json
-          p_purpose?: string
-          p_revoke_previous?: boolean
           p_scopes?: string[]
-          p_user_id?: string
+          p_revoke_previous?: boolean
         }
         Returns: Json
       }
@@ -1073,32 +1144,32 @@ export type Database = {
       get_account_invitations: {
         Args: { account_slug: string }
         Returns: {
-          account_id: string
-          created_at: string
-          email: string
-          expires_at: string
           id: number
+          email: string
+          account_id: string
           invited_by: string
-          inviter_email: string
-          inviter_name: string
           role: string
+          created_at: string
           updated_at: string
+          expires_at: string
+          inviter_name: string
+          inviter_email: string
         }[]
       }
       get_account_members: {
         Args: { account_slug: string }
         Returns: {
-          account_id: string
-          created_at: string
-          email: string
           id: string
-          name: string
-          picture_url: string
-          primary_owner_user_id: string
+          user_id: string
+          account_id: string
           role: string
           role_hierarchy_level: number
+          primary_owner_user_id: string
+          name: string
+          email: string
+          picture_url: string
+          created_at: string
           updated_at: string
-          user_id: string
         }[]
       }
       get_config: {
@@ -1119,17 +1190,17 @@ export type Database = {
       }
       has_more_elevated_role: {
         Args: {
-          role_name: string
-          target_account_id: string
           target_user_id: string
+          target_account_id: string
+          role_name: string
         }
         Returns: boolean
       }
       has_permission: {
         Args: {
+          user_id: string
           account_id: string
           permission_name: Database["public"]["Enums"]["app_permissions"]
-          user_id: string
         }
         Returns: boolean
       }
@@ -1139,9 +1210,9 @@ export type Database = {
       }
       has_same_role_hierarchy_level: {
         Args: {
-          role_name: string
-          target_account_id: string
           target_user_id: string
+          target_account_id: string
+          role_name: string
         }
         Returns: boolean
       }
@@ -1182,29 +1253,29 @@ export type Database = {
         Returns: {
           id: string
           name: string
-          permissions: Database["public"]["Enums"]["app_permissions"][]
           picture_url: string
-          primary_owner_user_id: string
+          slug: string
           role: string
           role_hierarchy_level: number
-          slug: string
+          primary_owner_user_id: string
           subscription_status: Database["public"]["Enums"]["subscription_status"]
+          permissions: Database["public"]["Enums"]["app_permissions"][]
         }[]
       }
       transfer_team_account_ownership: {
-        Args: { new_owner_id: string; target_account_id: string }
+        Args: { target_account_id: string; new_owner_id: string }
         Returns: undefined
       }
       upsert_order: {
         Args: {
-          billing_provider: Database["public"]["Enums"]["billing_provider"]
-          currency: string
-          line_items: Json
-          status: Database["public"]["Enums"]["payment_status"]
           target_account_id: string
           target_customer_id: string
           target_order_id: string
+          status: Database["public"]["Enums"]["payment_status"]
+          billing_provider: Database["public"]["Enums"]["billing_provider"]
           total_amount: number
+          currency: string
+          line_items: Json
         }
         Returns: {
           account_id: string
@@ -1220,19 +1291,19 @@ export type Database = {
       }
       upsert_subscription: {
         Args: {
-          active: boolean
-          billing_provider: Database["public"]["Enums"]["billing_provider"]
-          cancel_at_period_end: boolean
-          currency: string
-          line_items: Json
-          period_ends_at: string
-          period_starts_at: string
-          status: Database["public"]["Enums"]["subscription_status"]
           target_account_id: string
           target_customer_id: string
           target_subscription_id: string
-          trial_ends_at?: string
+          active: boolean
+          status: Database["public"]["Enums"]["subscription_status"]
+          billing_provider: Database["public"]["Enums"]["billing_provider"]
+          cancel_at_period_end: boolean
+          currency: string
+          period_starts_at: string
+          period_ends_at: string
+          line_items: Json
           trial_starts_at?: string
+          trial_ends_at?: string
         }
         Returns: {
           account_id: string
@@ -1253,13 +1324,13 @@ export type Database = {
       }
       verify_nonce: {
         Args: {
-          p_ip?: unknown
-          p_max_verification_attempts?: number
-          p_purpose: string
-          p_required_scopes?: string[]
           p_token: string
-          p_user_agent?: string
+          p_purpose: string
           p_user_id?: string
+          p_required_scopes?: string[]
+          p_max_verification_attempts?: number
+          p_ip?: unknown
+          p_user_agent?: string
         }
         Returns: Json
       }
@@ -1275,6 +1346,7 @@ export type Database = {
         | "settings.manage"
         | "members.manage"
         | "invites.manage"
+      barber_invitation_status: "pending" | "accepted" | "expired" | "revoked"
       billing_provider: "stripe" | "lemon-squeezy" | "paddle"
       notification_channel: "in_app" | "email"
       notification_type: "info" | "warning" | "error"
@@ -1315,7 +1387,6 @@ export type Database = {
           owner: string | null
           owner_id: string | null
           public: boolean | null
-          type: Database["storage"]["Enums"]["buckettype"]
           updated_at: string | null
         }
         Insert: {
@@ -1328,7 +1399,6 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string | null
         }
         Update: {
@@ -1341,111 +1411,9 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string | null
         }
         Relationships: []
-      }
-      buckets_analytics: {
-        Row: {
-          created_at: string
-          format: string
-          id: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          format?: string
-          id: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          format?: string
-          id?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      iceberg_namespaces: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "iceberg_namespaces_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_analytics"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      iceberg_tables: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          location: string
-          name: string
-          namespace_id: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id?: string
-          location: string
-          name: string
-          namespace_id: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          location?: string
-          name?: string
-          namespace_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "iceberg_tables_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_analytics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "iceberg_tables_namespace_id_fkey"
-            columns: ["namespace_id"]
-            isOneToOne: false
-            referencedRelation: "iceberg_namespaces"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       migrations: {
         Row: {
@@ -1664,7 +1632,7 @@ export type Database = {
         Returns: undefined
       }
       can_insert_object: {
-        Args: { bucketid: string; metadata: Json; name: string; owner: string }
+        Args: { bucketid: string; name: string; owner: string; metadata: Json }
         Returns: undefined
       }
       delete_prefix: {
@@ -1698,38 +1666,38 @@ export type Database = {
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>
         Returns: {
-          bucket_id: string
           size: number
+          bucket_id: string
         }[]
       }
       list_multipart_uploads_with_delimiter: {
         Args: {
           bucket_id: string
+          prefix_param: string
           delimiter_param: string
           max_keys?: number
           next_key_token?: string
           next_upload_token?: string
-          prefix_param: string
         }
         Returns: {
-          created_at: string
-          id: string
           key: string
+          id: string
+          created_at: string
         }[]
       }
       list_objects_with_delimiter: {
         Args: {
           bucket_id: string
+          prefix_param: string
           delimiter_param: string
           max_keys?: number
-          next_token?: string
-          prefix_param: string
           start_after?: string
+          next_token?: string
         }
         Returns: {
+          name: string
           id: string
           metadata: Json
-          name: string
           updated_at: string
         }[]
       }
@@ -1739,84 +1707,84 @@ export type Database = {
       }
       search: {
         Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
           prefix: string
+          bucketname: string
+          limits?: number
+          levels?: number
+          offsets?: number
           search?: string
           sortcolumn?: string
           sortorder?: string
         }
         Returns: {
-          created_at: string
+          name: string
           id: string
+          updated_at: string
+          created_at: string
           last_accessed_at: string
           metadata: Json
-          name: string
-          updated_at: string
         }[]
       }
       search_legacy_v1: {
         Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
           prefix: string
+          bucketname: string
+          limits?: number
+          levels?: number
+          offsets?: number
           search?: string
           sortcolumn?: string
           sortorder?: string
         }
         Returns: {
-          created_at: string
+          name: string
           id: string
+          updated_at: string
+          created_at: string
           last_accessed_at: string
           metadata: Json
-          name: string
-          updated_at: string
         }[]
       }
       search_v1_optimised: {
         Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
           prefix: string
+          bucketname: string
+          limits?: number
+          levels?: number
+          offsets?: number
           search?: string
           sortcolumn?: string
           sortorder?: string
         }
         Returns: {
-          created_at: string
+          name: string
           id: string
+          updated_at: string
+          created_at: string
           last_accessed_at: string
           metadata: Json
-          name: string
-          updated_at: string
         }[]
       }
       search_v2: {
         Args: {
-          bucket_name: string
-          levels?: number
-          limits?: number
           prefix: string
+          bucket_name: string
+          limits?: number
+          levels?: number
           start_after?: string
         }
         Returns: {
-          created_at: string
-          id: string
           key: string
-          metadata: Json
           name: string
+          id: string
           updated_at: string
+          created_at: string
+          metadata: Json
         }[]
       }
     }
     Enums: {
-      buckettype: "STANDARD" | "ANALYTICS"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1824,25 +1792,21 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -1860,16 +1824,14 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -1885,16 +1847,14 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -1910,16 +1870,14 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -1927,16 +1885,14 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
+    | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof Database
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
@@ -1958,6 +1914,7 @@ export const Constants = {
         "members.manage",
         "invites.manage",
       ],
+      barber_invitation_status: ["pending", "accepted", "expired", "revoked"],
       billing_provider: ["stripe", "lemon-squeezy", "paddle"],
       notification_channel: ["in_app", "email"],
       notification_type: ["info", "warning", "error"],
@@ -1981,9 +1938,7 @@ export const Constants = {
     },
   },
   storage: {
-    Enums: {
-      buckettype: ["STANDARD", "ANALYTICS"],
-    },
+    Enums: {},
   },
 } as const
 

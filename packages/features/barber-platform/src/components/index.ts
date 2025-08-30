@@ -8,3 +8,5 @@ export { StoreDialog } from './store-dialog';
 export { StoreDetailsDialog } from './store-details-dialog';
 export { BarberDialog } from './barber-dialog';
 export { BarberDetailsDialog } from './barber-details-dialog';
+export { WorkstationCreateDialog } from './workstation-create-dialog';
+export { DiscountDialog } from './discount-dialog';

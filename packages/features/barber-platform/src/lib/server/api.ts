@@ -4,7 +4,7 @@ import { Database } from '@kit/supabase/database';
 import { StoreWithStats, WorkstationWithUsage, BarberWithStats } from '../../types';
 
 class BarberPlatformApi {
-  constructor(private readonly client: SupabaseClient<Database>) {}
+  constructor(private readonly client: SupabaseClient<Database>) { }
 
   /**
    * Get store list with statistics
@@ -39,7 +39,10 @@ class BarberPlatformApi {
   async getWorkstationsWithUsage(storeId?: string): Promise<WorkstationWithUsage[]> {
     let query = this.client
       .from('workstations')
-      .select('*');
+      .select(`
+        *,
+        store:stores(name)
+      `);
 
     if (storeId) {
       query = query.eq('store_id', storeId);
@@ -141,20 +144,29 @@ class BarberPlatformApi {
     email?: string;
     experience_years?: number;
     specialty?: string[];
+    specialties?: string[]; // 支持前端传入的字段名
     description?: string;
     is_available?: boolean;
   }) {
     console.log('Creating barber with data:', barberData);
-    
+
     try {
-      // 对于管理员创建理发师，使用数据库的默认UUID生成而不是auth.uid()
+      // 处理字段映射：specialties -> specialty
+      const dataToInsert = {
+        name: barberData.name,
+        phone: barberData.phone,
+        email: barberData.email,
+        experience_years: barberData.experience_years,
+        specialty: barberData.specialty || barberData.specialties, // 支持两种字段名
+        description: barberData.description,
+        is_available: barberData.is_available ?? true
+      };
+
+      console.log('Inserting barber data:', dataToInsert);
+
       const { data, error } = await this.client
         .from('barbers')
-        .insert([{
-          ...barberData,
-          id: undefined, // 让数据库使用默认的UUID生成
-          is_available: barberData.is_available ?? true
-        }])
+        .insert([dataToInsert])
         .select()
         .single();
 
@@ -228,13 +240,25 @@ class BarberPlatformApi {
     store_id: string;
     number: string;
     type: Database['public']['Enums']['workstation_type'];
-    hourly_rate: number;
-    daily_rate: number;
+    is_shared?: boolean;
+    shared_start_date?: string;
+    shared_end_date?: string;
     equipment?: string[];
   }) {
+    // 过滤掉空字符串的日期字段，提供默认值
+    const dataToInsert = {
+      ...workstationData,
+      shared_start_date: workstationData.shared_start_date || null,
+      shared_end_date: workstationData.shared_end_date || null,
+      // 提供数据库schema中必需的默认值
+      hourly_rate: 0,
+      daily_rate: 0,
+      discount_percentage: 0,
+    };
+
     const { data, error } = await this.client
       .from('workstations')
-      .insert([workstationData])
+      .insert([dataToInsert])
       .select()
       .single();
 
@@ -249,18 +273,45 @@ class BarberPlatformApi {
    * Update workstation information
    */
   async updateWorkstation(workstationId: string, updates: Partial<Database['public']['Tables']['workstations']['Update']>) {
+    console.log('Updating workstation with data:', updates);
+
+    // 处理空字符串时间戳字段，转换为null
+    const processedUpdates = { ...updates };
+
+    // 处理时间戳字段：空字符串 -> null
+    if (processedUpdates.shared_start_date === '') {
+      processedUpdates.shared_start_date = null;
+    }
+    if (processedUpdates.shared_end_date === '') {
+      processedUpdates.shared_end_date = null;
+    }
+    // 其他时间戳字段如果存在也进行处理
+    if ('discount_start_date' in processedUpdates && processedUpdates.discount_start_date === '') {
+      (processedUpdates as any).discount_start_date = null;
+    }
+    if ('discount_end_date' in processedUpdates && processedUpdates.discount_end_date === '') {
+      (processedUpdates as any).discount_end_date = null;
+    }
+
+    console.log('Processed updates:', processedUpdates);
+
     const { data, error } = await this.client
       .from('workstations')
-      .update(updates)
+      .update(processedUpdates)
       .eq('id', workstationId)
-      .select()
-      .single();
+      .select();
 
     if (error) {
+      console.error('Database error updating workstation:', error);
       throw error;
     }
 
-    return data;
+    if (!data || data.length === 0) {
+      throw new Error(`Workstation with ID ${workstationId} not found`);
+    }
+
+    console.log('Workstation updated successfully:', data[0]);
+    return data[0];
   }
 
   /**
@@ -288,11 +339,11 @@ class BarberPlatformApi {
    */
   async updateBarber(barberId: string, updates: any) {
     console.log('Updating barber in database:', barberId, updates);
-    
+
     try {
       // 过滤掉不存在的字段（如 specialties -> specialty）
       const validUpdates: Partial<Database['public']['Tables']['barbers']['Update']> = {};
-      
+
       if (updates.name !== undefined) validUpdates.name = updates.name;
       if (updates.phone !== undefined) validUpdates.phone = updates.phone;
       if (updates.email !== undefined) validUpdates.email = updates.email;
@@ -413,7 +464,7 @@ class BarberPlatformApi {
   }) {
     const { data: invitation, error: inviteError } = await this.client
       .from('barber_invitations' as any)
-      .update({ 
+      .update({
         status: 'accepted' as any,
         accepted_at: new Date().toISOString()
       })
