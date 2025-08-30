@@ -16,6 +16,8 @@
   "modalConfirmationQuestion": "Are you sure you want to continue?",
   "imageInputLabel": "Click here to upload an image",
   "cancel": "Cancel",
+  "assign": "Assign",
+  "assigning": "Assigning...",
   "clear": "Clear",
   "notFound": "Not Found",
   "backToHomePage": "Back to Home Page",

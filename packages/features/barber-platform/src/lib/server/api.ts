@@ -285,13 +285,6 @@ class BarberPlatformApi {
     if (processedUpdates.shared_end_date === '') {
       processedUpdates.shared_end_date = null;
     }
-    // 其他时间戳字段如果存在也进行处理
-    if ('discount_start_date' in processedUpdates && processedUpdates.discount_start_date === '') {
-      (processedUpdates as any).discount_start_date = null;
-    }
-    if ('discount_end_date' in processedUpdates && processedUpdates.discount_end_date === '') {
-      (processedUpdates as any).discount_end_date = null;
-    }
 
     console.log('Processed updates:', processedUpdates);
 

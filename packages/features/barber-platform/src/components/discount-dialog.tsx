@@ -70,10 +70,21 @@ export function DiscountDialog({
   // Reset form when workstation changes
   useEffect(() => {
     if (workstation && open) {
+      // Format dates for date input (YYYY-MM-DD)
+      const formatDateForInput = (dateString: string | null | undefined) => {
+        if (!dateString) return '';
+        try {
+          const date = new Date(dateString);
+          return date.toISOString().split('T')[0];
+        } catch {
+          return '';
+        }
+      };
+
       form.reset({
         discount_percentage: workstation.discount_percentage || 0,
-        discount_start_date: workstation.discount_start_date || '',
-        discount_end_date: workstation.discount_end_date || '',
+        discount_start_date: formatDateForInput(workstation.discount_start_date),
+        discount_end_date: formatDateForInput(workstation.discount_end_date),
         is_discount_active: workstation.is_discount_active || false,
       });
     }
@@ -84,15 +95,33 @@ export function DiscountDialog({
 
     setIsLoading(true);
     try {
-      // Update the workstation's discount information
+      // Update the workstation's discount information using admin API
       const updates = {
         discount_percentage: data.is_discount_active ? data.discount_percentage : 0,
         is_discount_active: data.is_discount_active,
-        discount_start_date: data.discount_start_date || null,
-        discount_end_date: data.discount_end_date || null,
+        discount_start_date: data.discount_start_date ? new Date(data.discount_start_date).toISOString() : null,
+        discount_end_date: data.discount_end_date ? new Date(data.discount_end_date).toISOString() : null,
       };
 
-      await service.updateWorkstation(workstation.id, updates);
+      // 使用admin API来更新折扣信息，绕过RLS限制
+      const response = await fetch('/api/admin/workstations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'update',
+          data: { id: workstation.id, updates }
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Failed to update discount settings: ${response.status} ${response.statusText}`);
+      }
+
       toast.success('Discount settings updated successfully');
       onSuccess();
       onOpenChange(false);

@@ -52,6 +52,22 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: true });
             }
 
+            case 'assignBarber': {
+                const { workstationId, barberId } = data;
+                console.log('Assigning barber to workstation:', workstationId, barberId);
+                try {
+                    const result = await api.assignBarberToWorkstation(workstationId, barberId);
+                    console.log('Barber assigned successfully:', result);
+                    return NextResponse.json({ success: true, data: result });
+                } catch (assignError) {
+                    console.error('Error assigning barber:', assignError);
+                    return NextResponse.json({
+                        success: false,
+                        error: assignError instanceof Error ? assignError.message : 'Failed to assign barber'
+                    }, { status: 500 });
+                }
+            }
+
             case 'getWorkstations': {
                 const workstationsList = await api.getWorkstationsWithUsage();
                 return NextResponse.json({ success: true, data: workstationsList });

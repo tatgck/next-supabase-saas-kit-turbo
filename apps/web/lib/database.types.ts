@@ -980,10 +980,13 @@ export type Database = {
           created_at: string | null
           current_barber_id: string | null
           daily_rate: number
+          discount_end_date: string | null
           discount_percentage: number | null
+          discount_start_date: string | null
           equipment: string[] | null
           hourly_rate: number
           id: string
+          is_discount_active: boolean
           is_shared: boolean
           last_used: string | null
           next_booking: string | null
@@ -1002,10 +1005,13 @@ export type Database = {
           created_at?: string | null
           current_barber_id?: string | null
           daily_rate: number
+          discount_end_date?: string | null
           discount_percentage?: number | null
+          discount_start_date?: string | null
           equipment?: string[] | null
           hourly_rate: number
           id?: string
+          is_discount_active?: boolean
           is_shared?: boolean
           last_used?: string | null
           next_booking?: string | null
@@ -1024,10 +1030,13 @@ export type Database = {
           created_at?: string | null
           current_barber_id?: string | null
           daily_rate?: number
+          discount_end_date?: string | null
           discount_percentage?: number | null
+          discount_start_date?: string | null
           equipment?: string[] | null
           hourly_rate?: number
           id?: string
+          is_discount_active?: boolean
           is_shared?: boolean
           last_used?: string | null
           next_booking?: string | null

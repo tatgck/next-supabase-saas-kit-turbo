@@ -72,7 +72,7 @@ create table if not exists public.workstations (
   shared_start_date timestamptz,
   shared_end_date timestamptz,
   equipment text[],
-  current_barber_id uuid references auth.users,
+  current_barber_id uuid references public.barbers(id),
   utilization integer default 0,
   bookings_count integer default 0,
   revenue numeric(10,2) default 0,
@@ -211,8 +211,12 @@ create policy "stores_service_role_full_access" on public.stores for all to serv
 
 -- 工位RLS策略
 create policy "workstations_read" on public.workstations for select to authenticated using (true);
-create policy "workstations_manage" on public.workstations for all to authenticated 
+create policy "workstations_manage" on public.workstations for all to authenticated
   using (exists (select 1 from public.stores where id = store_id and owner_id = auth.uid()));
+
+-- 允许超级管理员完全访问工位
+create policy "workstations_super_admin_full_access" on public.workstations for all to authenticated
+  using (public.is_super_admin());
 
 -- 工位可预约时间段RLS策略
 create policy "workstation_booking_slots_read" on public.workstation_booking_slots for select to authenticated using (true);

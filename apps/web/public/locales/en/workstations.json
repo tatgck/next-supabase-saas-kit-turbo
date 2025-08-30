@@ -57,5 +57,35 @@
     "sharedDescription": "Allow other barbers to book this workstation during specified times",
     "sharingStartDate": "Sharing Start Date",
     "sharingEndDate": "Sharing End Date"
-  }
+  },
+
+  "discount": {
+    "title": "Discount Management for Workstation {{number}}",
+    "enableDiscount": "Enable Discount",
+    "enableDescription": "Enable discount pricing for this workstation",
+    "percentage": "Discount Percentage",
+    "percentageDescription": "Discount percentage to apply (0-100%)",
+    "startDate": "Discount Start Date",
+    "endDate": "Discount End Date",
+    "active": "Discount Active"
+  },
+
+  "status": {
+    "available": "Available",
+    "occupied": "Occupied",
+    "reserved": "Reserved",
+    "maintenance": "Maintenance"
+  },
+
+  "type": {
+    "standard": "Standard",
+    "premium": "Premium",
+    "vip": "VIP"
+  },
+
+  "shared": {
+    "available": "Shared Workstation"
+  },
+
+  "store": "Store"
 }

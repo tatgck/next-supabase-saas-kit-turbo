@@ -85,7 +85,28 @@ export function AssignBarberDialog({
 
     setIsLoading(true);
     try {
-      await service.assignBarberToWorkstation(workstation.id, selectedBarberId);
+      // 使用admin API来指派理发师，绕过RLS限制
+      const response = await fetch('/api/admin/workstations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          action: 'assignBarber',
+          data: {
+            workstationId: workstation.id,
+            barberId: selectedBarberId
+          }
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Failed to assign barber: ${response.status} ${response.statusText}`);
+      }
+
       toast.success('Barber assigned successfully');
       onSuccess();
       onOpenChange(false);

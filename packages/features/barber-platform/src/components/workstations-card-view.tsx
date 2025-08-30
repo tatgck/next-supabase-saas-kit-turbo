@@ -75,7 +75,7 @@ export function WorkstationsCardView({ workstations, onRefresh }: WorkstationsCa
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {workstations.map((workstation) => (
-          <Card key={workstation.id} className="hover:shadow-lg transition-shadow">
+          <Card key={workstation.id} className="hover:shadow-lg transition-shadow h-full flex flex-col">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -95,51 +95,69 @@ export function WorkstationsCardView({ workstations, onRefresh }: WorkstationsCa
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-4">
-              {/* Performance Metrics */}
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    <Trans i18nKey="workstations:table.utilization" />
-                  </span>
-                  <span className="font-medium">
-                    {workstation.utilization}%
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    <Trans i18nKey="workstations:details.bookingsCount" />
-                  </span>
-                  <span className="font-medium">
-                    {workstation.bookings_count}
-                  </span>
-                </div>
-              </div>
-
-
-              {/* Store Information */}
-              {workstation.store && (
-                <div className="text-sm border-t pt-3">
+            <CardContent className="flex flex-col h-full">
+              <div className="flex-1 space-y-4">
+                {/* Performance Metrics */}
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      <Trans i18nKey="workstations:store" />
+                      <Trans i18nKey="workstations:table.utilization" />
                     </span>
                     <span className="font-medium">
-                      {workstation.store.name}
+                      {workstation.utilization}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      <Trans i18nKey="workstations:details.bookingsCount" />
+                    </span>
+                    <span className="font-medium">
+                      {workstation.bookings_count}
                     </span>
                   </div>
                 </div>
-              )}
 
-              {/* Shared Status */}
-              {workstation.is_shared && (
-                <div className="text-sm text-green-600 border-t pt-3">
-                  <Trans i18nKey="workstations:shared.available" />
-                </div>
-              )}
+                {/* Store Information */}
+                {workstation.store && (
+                  <div className="text-sm border-t pt-3">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        <Trans i18nKey="workstations:store" />
+                      </span>
+                      <span className="font-medium">
+                        {workstation.store.name}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
-              {/* Action Buttons */}
-              <div className="flex justify-between pt-3 border-t">
+                {/* Shared Status */}
+                {workstation.is_shared && (
+                  <div className="text-sm text-green-600 border-t pt-3">
+                    <Trans i18nKey="workstations:shared.available" />
+                  </div>
+                )}
+
+                {/* Discount Status */}
+                {workstation.is_discount_active && workstation.discount_percentage && workstation.discount_percentage > 0 && (
+                  <div className="text-sm text-blue-600 border-t pt-3">
+                    <div className="flex items-center gap-1">
+                      <Percent className="h-3 w-3" />
+                      <span>
+                        <Trans i18nKey="workstations:discount.active" />: {workstation.discount_percentage}%
+                      </span>
+                    </div>
+                    {workstation.discount_start_date && workstation.discount_end_date && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {new Date(workstation.discount_start_date).toLocaleDateString()} - {new Date(workstation.discount_end_date).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons - Always at bottom */}
+              <div className="flex justify-between pt-3 border-t mt-4">
                 <Button
                   variant="ghost"
                   size="icon"
